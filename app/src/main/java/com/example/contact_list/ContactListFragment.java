@@ -1,7 +1,9 @@
 package com.example.contact_list;
 
 import android.Manifest;
+import android.content.ContentResolver;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -12,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +54,7 @@ public class ContactListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContacts=new ArrayList<>();
         if (getArguments() != null) {
 
         }
@@ -58,7 +62,7 @@ public class ContactListFragment extends Fragment {
             getContactPermission(Manifest.permission.READ_CONTACTS);
         }
         else{
-
+            getAllContacts();
 
         }
 
@@ -82,10 +86,7 @@ public class ContactListFragment extends Fragment {
 
     }
     private void updateView(){
-        mContacts=new ArrayList<>();
-        mContacts.add(new Contact("fateme"));
-        mContacts.add(new Contact("zahra"));
-        mContacts.add(new Contact("mina"));
+
 
         if (mContactAdapter==null){
             mContactAdapter=new ContactAdapter(mContacts);
@@ -115,7 +116,44 @@ public class ContactListFragment extends Fragment {
     }
 
     // TODO: 9/10/2021 check deny request...
+    private void getAllContacts(){
 
+        ContentResolver contentResolver=getActivity().getContentResolver();
+        Cursor cursor=contentResolver.
+                query(ContactsContract.Contacts.CONTENT_URI,
+                        null,null,null,null);
+
+        if (cursor.getCount()>0 && cursor!=null){
+            cursor.moveToFirst();
+            while (cursor.moveToNext()){
+                String contact_id=cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                String disPlay_name=cursor.
+                        getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                int has_phoneNumber=Integer.parseInt(cursor.
+                        getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
+                List<String> phone_NOs=new ArrayList<>();
+                if (has_phoneNumber >0){
+                    Cursor cursor2=contentResolver
+                            .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                                    null,
+                                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID+"=?",
+                                    new String[]{contact_id},
+                                    null);
+                    cursor2.moveToFirst();
+                    while (cursor2.moveToNext()){
+                        String phone_No=cursor2.
+                                getString(cursor2.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        phone_NOs.add(phone_No);
+                    }
+                }
+                Contact contact=new Contact(contact_id,disPlay_name,phone_NOs);
+                mContacts.add(contact);
+            }
+
+
+        }
+        // TODO: 9/10/2021 save in to db
+    }
     private class ContactHolder extends RecyclerView.ViewHolder{
         private TextView mTextView_display_name;
         private Contact mContact;
