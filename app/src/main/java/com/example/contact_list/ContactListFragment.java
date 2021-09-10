@@ -1,8 +1,13 @@
 package com.example.contact_list;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,6 +21,7 @@ import android.widget.TextView;
 
 import com.example.contact_list.model.Contact;
 
+import java.security.Permission;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +31,7 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class ContactListFragment extends Fragment {
+    public static final int REQUEST_CODE_CONTACT_PERMISSION = 1;
     private RecyclerView mRecyclerView_contact;
     private ContactAdapter mContactAdapter;
     private List<Contact>mContacts;
@@ -45,6 +52,13 @@ public class ContactListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+
+        }
+        if (!hasContactPermission(Manifest.permission.READ_CONTACTS)){
+            getContactPermission(Manifest.permission.READ_CONTACTS);
+        }
+        else{
+
 
         }
 
@@ -83,6 +97,24 @@ public class ContactListFragment extends Fragment {
 
     }
 
+    private boolean hasContactPermission(String permission){
+        boolean result=false;
+        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+            int has_permission= ContextCompat.
+                    checkSelfPermission(getActivity().getApplicationContext(),permission);
+            if (has_permission== PackageManager.PERMISSION_GRANTED)
+                result=true;
+        }else {
+            result=true;
+        }
+        return result;
+    }
+    private void getContactPermission(String permission){
+        String[] permissions={permission};
+        ActivityCompat.requestPermissions(getActivity(),permissions, REQUEST_CODE_CONTACT_PERMISSION);
+    }
+
+    // TODO: 9/10/2021 check deny request...
 
     private class ContactHolder extends RecyclerView.ViewHolder{
         private TextView mTextView_display_name;
