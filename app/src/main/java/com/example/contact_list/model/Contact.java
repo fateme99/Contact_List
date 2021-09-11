@@ -5,14 +5,14 @@ import java.util.List;
 public class Contact {
     private String mID;
     private String mName_Display;
-    private List<String> mPhone_NOs;
+    private String mPhone_NO;
     // TODO: 9/10/2021 complete this model
 
 
-    public Contact(String ID, String name_Display, List<String> phone_NOs) {
+    public Contact(String ID, String name_Display, String phone_NO) {
         mID = ID;
         mName_Display = name_Display;
-        mPhone_NOs = phone_NOs;
+        mPhone_NO = phone_NO;
     }
 
     public String getID() {
@@ -23,12 +23,12 @@ public class Contact {
         mID = ID;
     }
 
-    public List<String> getPhone_NOs() {
-        return mPhone_NOs;
+    public String getPhone_NO() {
+        return mPhone_NO;
     }
 
-    public void setPhone_NOs(List<String> phone_NOs) {
-        mPhone_NOs = phone_NOs;
+    public void setPhone_NO(String phone_NO) {
+        mPhone_NO = phone_NO;
     }
 
     public String getName_Display() {

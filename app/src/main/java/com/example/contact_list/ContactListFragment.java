@@ -23,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.contact_list.model.Contact;
+import com.example.contact_list.repository.ContactRepository;
 
 import java.security.Permission;
 import java.util.ArrayList;
@@ -37,8 +38,8 @@ public class ContactListFragment extends Fragment {
     public static final int REQUEST_CODE_CONTACT_PERMISSION = 1;
     private RecyclerView mRecyclerView_contact;
     private ContactAdapter mContactAdapter;
-    private List<Contact>mContacts;
-
+    private List<Contact> mContacts;
+    private ContactRepository mContactRepository;
     public ContactListFragment() {
         // Required empty public constructor
     }
@@ -54,14 +55,14 @@ public class ContactListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mContacts=new ArrayList<>();
+        mContacts = new ArrayList<>();
+        mContactRepository=ContactRepository.getInstance(getActivity());
         if (getArguments() != null) {
 
         }
-        if (!hasContactPermission(Manifest.permission.READ_CONTACTS)){
+        if (!hasContactPermission(Manifest.permission.READ_CONTACTS)) {
             getContactPermission(Manifest.permission.READ_CONTACTS);
-        }
-        else{
+        } else {
             getAllContacts();
 
         }
@@ -72,94 +73,109 @@ public class ContactListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view= inflater.inflate(R.layout.fragment_contact_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_contact_list, container, false);
         findViews(view);
         initView();
         return view;
     }
-    private void findViews(View view){
-        mRecyclerView_contact=view.findViewById(R.id.contact_list_recycler_view);
+
+    private void findViews(View view) {
+        mRecyclerView_contact = view.findViewById(R.id.contact_list_recycler_view);
     }
-    private void initView(){
+
+    private void initView() {
         mRecyclerView_contact.setLayoutManager(new LinearLayoutManager(getActivity()));
         updateView();
 
     }
-    private void updateView(){
+
+    private void updateView() {
 
 
-        if (mContactAdapter==null){
-            mContactAdapter=new ContactAdapter(mContacts);
+        if (mContactAdapter == null) {
+            mContacts=mContactRepository.getContacts();
+            mContactAdapter = new ContactAdapter(mContacts);
             mRecyclerView_contact.setAdapter(mContactAdapter);
-        }
-        else {
+        } else {
             mContactAdapter.notifyDataSetChanged();
         }
 
     }
 
-    private boolean hasContactPermission(String permission){
-        boolean result=false;
-        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
-            int has_permission= ContextCompat.
-                    checkSelfPermission(getActivity().getApplicationContext(),permission);
-            if (has_permission== PackageManager.PERMISSION_GRANTED)
-                result=true;
-        }else {
-            result=true;
+    private boolean hasContactPermission(String permission) {
+        boolean result = false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int has_permission = ContextCompat.
+                    checkSelfPermission(getActivity().getApplicationContext(), permission);
+            if (has_permission == PackageManager.PERMISSION_GRANTED)
+                result = true;
+        } else {
+            result = true;
         }
         return result;
     }
-    private void getContactPermission(String permission){
-        String[] permissions={permission};
-        ActivityCompat.requestPermissions(getActivity(),permissions, REQUEST_CODE_CONTACT_PERMISSION);
+
+    private void getContactPermission(String permission) {
+        String[] permissions = {permission};
+        ActivityCompat.requestPermissions(getActivity(), permissions, REQUEST_CODE_CONTACT_PERMISSION);
     }
 
     // TODO: 9/10/2021 check deny request...
-    private void getAllContacts(){
+    private void getAllContacts() {
 
-        ContentResolver contentResolver=getActivity().getContentResolver();
-        Cursor cursor=contentResolver.
+        ContentResolver contentResolver = getActivity().getContentResolver();
+        Cursor cursor = contentResolver.
                 query(ContactsContract.Contacts.CONTENT_URI,
-                        null,null,null,null);
+                        null, null, null, null);
 
-        if (cursor.getCount()>0 && cursor!=null){
+        if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
-            while (cursor.moveToNext()){
-                String contact_id=cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-                String disPlay_name=cursor.
+            while (cursor.moveToNext()) {
+                String contact_id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                String disPlay_name = cursor.
                         getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                int has_phoneNumber=Integer.parseInt(cursor.
+                /*String phone_NO=cursor.
+                        getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));*/
+
+                /*int has_phoneNumber = Integer.parseInt(cursor.
                         getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
-                List<String> phone_NOs=new ArrayList<>();
-                if (has_phoneNumber >0){
-                    Cursor cursor2=contentResolver
+                List<String> phone_NOs = new ArrayList<>();
+                if (has_phoneNumber > 0) {
+                    Cursor cursor2 = contentResolver
                             .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                                     null,
-                                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID+"=?",
+                                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?",
                                     new String[]{contact_id},
                                     null);
+
                     cursor2.moveToFirst();
-                    while (cursor2.moveToNext()){
-                        String phone_No=cursor2.
+                    while (cursor2.moveToNext()) {
+                        String phone_No = cursor2.
                                 getString(cursor2.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                         phone_NOs.add(phone_No);
                     }
-                }
-                Contact contact=new Contact(contact_id,disPlay_name,phone_NOs);
-                mContacts.add(contact);
+
+
+                }*/
+
+                Contact contact = new Contact(contact_id, disPlay_name, "123");
+                mContactRepository.insert(contact);
+
             }
+            cursor.close();
 
 
         }
         // TODO: 9/10/2021 save in to db
     }
-    private class ContactHolder extends RecyclerView.ViewHolder{
+
+    private class ContactHolder extends RecyclerView.ViewHolder {
         private TextView mTextView_display_name;
         private Contact mContact;
-        public ContactHolder( View itemView) {
+
+        public ContactHolder(View itemView) {
             super(itemView);
-            mTextView_display_name=itemView.findViewById(R.id.display_name);
+            mTextView_display_name = itemView.findViewById(R.id.display_name);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -168,13 +184,15 @@ public class ContactListFragment extends Fragment {
                 }
             });
         }
-        public void bindContact(Contact contact){
-            mContact=contact;
+
+        public void bindContact(Contact contact) {
+            mContact = contact;
             mTextView_display_name.setText(mContact.getName_Display());
         }
     }
-    private class ContactAdapter extends RecyclerView.Adapter<ContactHolder>{
-        private List<Contact>mContacts;
+
+    private class ContactAdapter extends RecyclerView.Adapter<ContactHolder> {
+        private List<Contact> mContacts;
 
         public ContactAdapter(List<Contact> contacts) {
             mContacts = contacts;
@@ -189,15 +207,15 @@ public class ContactListFragment extends Fragment {
         }
 
         @Override
-        public ContactHolder onCreateViewHolder( ViewGroup parent, int viewType) {
-            View view=LayoutInflater.from(getActivity()).
-                    inflate(R.layout.contact_item,parent,false);
-            ContactHolder contactHolder=new ContactHolder(view);
+        public ContactHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(getActivity()).
+                    inflate(R.layout.contact_item, parent, false);
+            ContactHolder contactHolder = new ContactHolder(view);
             return contactHolder;
         }
 
         @Override
-        public void onBindViewHolder( ContactListFragment.ContactHolder holder, int position) {
+        public void onBindViewHolder(ContactListFragment.ContactHolder holder, int position) {
             holder.bindContact(mContacts.get(position));
         }
 
