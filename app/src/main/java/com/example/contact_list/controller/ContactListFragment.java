@@ -38,7 +38,7 @@ import java.util.List;
  */
 public class ContactListFragment extends Fragment {
     private static final String TAG_FRAGMENT_DETAIL = "detailContact";
-    public static final int REQUEST_CODE_CONTACT_PERMISSION = 1;
+
     private RecyclerView mRecyclerView_contact;
     private ContactAdapter mContactAdapter;
     private List<Contact> mContacts;
@@ -65,13 +65,7 @@ public class ContactListFragment extends Fragment {
         if (getArguments() != null) {
 
         }
-        if (!hasContactPermission(Manifest.permission.READ_CONTACTS)) {
-            getContactPermission(Manifest.permission.READ_CONTACTS);
 
-        } else {
-            getAllContacts();
-
-        }
 
     }
 
@@ -98,6 +92,7 @@ public class ContactListFragment extends Fragment {
     }
 
     private void updateView() {
+        getAllContacts();
         mContactRepository = ContactRepository.getInstance(getActivity());
         mContacts = mContactRepository.getContacts();
         if (mContacts.size()==0){
@@ -118,23 +113,7 @@ public class ContactListFragment extends Fragment {
 
     }
 
-    private boolean hasContactPermission(String permission) {
-        boolean result = false;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int has_permission = ContextCompat.
-                    checkSelfPermission(getActivity().getApplicationContext(), permission);
-            if (has_permission == PackageManager.PERMISSION_GRANTED)
-                result = true;
-        } else {
-            result = true;
-        }
-        return result;
-    }
 
-    private void getContactPermission(String permission) {
-        String[] permissions = {permission};
-        ActivityCompat.requestPermissions(getActivity(), permissions, REQUEST_CODE_CONTACT_PERMISSION);
-    }
 
     // TODO: 9/10/2021 check deny request...
     private void getAllContacts() {
@@ -177,27 +156,6 @@ public class ContactListFragment extends Fragment {
                             cursor1.close();
                         }
                     }
-                /*int has_phoneNumber = Integer.parseInt(cursor.
-                        getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
-                List<String> phone_NOs = new ArrayList<>();
-                if (has_phoneNumber > 0) {
-                    Cursor cursor2 = contentResolver
-                            .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                                    null,
-                                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?",
-                                    new String[]{contact_id},
-                                    null);
-
-                    cursor2.moveToFirst();
-                    while (cursor2.moveToNext()) {
-                        String phone_No = cursor2.
-                                getString(cursor2.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                        phone_NOs.add(phone_No);
-                    }
-                    cursor2.close();
-
-
-                }*/
 
                     Contact contact = new Contact(contact_id, disPlay_name, contact_NO);
                     if (!mContactRepository.is_exist(contact_id)) {
@@ -276,16 +234,7 @@ public class ContactListFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == REQUEST_CODE_CONTACT_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(getActivity(), "allowed...", Toast.LENGTH_SHORT).show();
-            getAllContacts();
-            updateView();
-        }
-    }
 
 
     @Override
