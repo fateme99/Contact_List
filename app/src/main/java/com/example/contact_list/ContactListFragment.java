@@ -35,6 +35,7 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class ContactListFragment extends Fragment {
+    private static final String TAG_FRAGMENT_DETAIL ="detailContact" ;
     public static final int REQUEST_CODE_CONTACT_PERMISSION = 1;
     private RecyclerView mRecyclerView_contact;
     private ContactAdapter mContactAdapter;
@@ -134,10 +135,9 @@ public class ContactListFragment extends Fragment {
                 String contact_id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
                 String disPlay_name = cursor.
                         getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                /*String phone_NO=cursor.
-                        getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));*/
 
-                /*int has_phoneNumber = Integer.parseInt(cursor.
+
+                int has_phoneNumber = Integer.parseInt(cursor.
                         getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
                 List<String> phone_NOs = new ArrayList<>();
                 if (has_phoneNumber > 0) {
@@ -154,9 +154,10 @@ public class ContactListFragment extends Fragment {
                                 getString(cursor2.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                         phone_NOs.add(phone_No);
                     }
+                    cursor2.close();
 
 
-                }*/
+                }
 
                 Contact contact = new Contact(contact_id, disPlay_name, "123");
                 mContactRepository.insert(contact);
@@ -180,7 +181,8 @@ public class ContactListFragment extends Fragment {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    // TODO: 9/10/2021 show details
+                    DetailFragment detailFragment=DetailFragment.newInstance(mContact);
+                    detailFragment.show(getActivity().getSupportFragmentManager(),TAG_FRAGMENT_DETAIL);
                 }
             });
         }
