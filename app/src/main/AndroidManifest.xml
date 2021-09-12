@@ -10,13 +10,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Contact_List">
-        <activity android:name=".ContactListActivity">
+        <activity android:name=".controller.ContactListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".service.ContactWatchService"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 
 </manifest>

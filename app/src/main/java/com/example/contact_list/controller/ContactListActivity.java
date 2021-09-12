@@ -1,4 +1,4 @@
-package com.example.contact_list;
+package com.example.contact_list.controller;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -7,6 +7,8 @@ import androidx.fragment.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+
+import com.example.contact_list.R;
 
 public class ContactListActivity extends AppCompatActivity {
 
@@ -24,7 +26,7 @@ public class ContactListActivity extends AppCompatActivity {
         if (fragment==null){
             fragmentManager.
                     beginTransaction().
-                    add(R.id.container_fragment,ContactListFragment.newInstance()).
+                    add(R.id.container_fragment, ContactListFragment.newInstance()).
                     commit();
         }
 

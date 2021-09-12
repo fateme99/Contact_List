@@ -1,13 +1,13 @@
-package com.example.contact_list;
+package com.example.contact_list.controller;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -18,14 +18,14 @@ import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.contact_list.R;
 import com.example.contact_list.model.Contact;
 import com.example.contact_list.repository.ContactRepository;
+import com.example.contact_list.service.ContactWatchService;
 
-import java.security.Permission;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,12 +35,13 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class ContactListFragment extends Fragment {
-    private static final String TAG_FRAGMENT_DETAIL ="detailContact" ;
+    private static final String TAG_FRAGMENT_DETAIL = "detailContact";
     public static final int REQUEST_CODE_CONTACT_PERMISSION = 1;
     private RecyclerView mRecyclerView_contact;
     private ContactAdapter mContactAdapter;
     private List<Contact> mContacts;
     private ContactRepository mContactRepository;
+
     public ContactListFragment() {
         // Required empty public constructor
     }
@@ -57,12 +58,13 @@ public class ContactListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContacts = new ArrayList<>();
-        mContactRepository=ContactRepository.getInstance(getActivity());
+        mContactRepository = ContactRepository.getInstance(getActivity());
         if (getArguments() != null) {
 
         }
         if (!hasContactPermission(Manifest.permission.READ_CONTACTS)) {
             getContactPermission(Manifest.permission.READ_CONTACTS);
+
         } else {
             getAllContacts();
 
@@ -91,15 +93,17 @@ public class ContactListFragment extends Fragment {
     }
 
     private void updateView() {
+        mContactRepository = ContactRepository.getInstance(getActivity());
+        mContacts = mContactRepository.getContacts();
 
 
         if (mContactAdapter == null) {
-            mContacts=mContactRepository.getContacts();
             mContactAdapter = new ContactAdapter(mContacts);
             mRecyclerView_contact.setAdapter(mContactAdapter);
-        } else {
-            mContactAdapter.notifyDataSetChanged();
         }
+        mContactAdapter.setContacts(mContacts);
+        mContactAdapter.notifyDataSetChanged();
+
 
     }
 
@@ -123,6 +127,8 @@ public class ContactListFragment extends Fragment {
 
     // TODO: 9/10/2021 check deny request...
     private void getAllContacts() {
+        Intent intent = new Intent(getActivity(), ContactWatchService.class);
+        getActivity().startService(intent);
 
         ContentResolver contentResolver = getActivity().getContentResolver();
         Cursor cursor = contentResolver.
@@ -160,14 +166,17 @@ public class ContactListFragment extends Fragment {
                 }
 
                 Contact contact = new Contact(contact_id, disPlay_name, "123");
-                mContactRepository.insert(contact);
+                if (!mContactRepository.is_exist(contact_id)) {
+                    mContactRepository.insert(contact);
+                }
+
 
             }
             cursor.close();
 
 
         }
-        // TODO: 9/10/2021 save in to db
+
     }
 
     private class ContactHolder extends RecyclerView.ViewHolder {
@@ -181,8 +190,8 @@ public class ContactListFragment extends Fragment {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    DetailFragment detailFragment=DetailFragment.newInstance(mContact);
-                    detailFragment.show(getActivity().getSupportFragmentManager(),TAG_FRAGMENT_DETAIL);
+                    DetailFragment detailFragment = DetailFragment.newInstance(mContact);
+                    detailFragment.show(getActivity().getSupportFragmentManager(), TAG_FRAGMENT_DETAIL);
                 }
             });
         }
@@ -227,5 +236,22 @@ public class ContactListFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
+        if (requestCode == REQUEST_CODE_CONTACT_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(getActivity(), "allowed...", Toast.LENGTH_SHORT).show();
+            getAllContacts();
+            updateView();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        updateView();
+        Toast.makeText(getActivity(), "onresumed update..", Toast.LENGTH_SHORT).show();
+    }
 }

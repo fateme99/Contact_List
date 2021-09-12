@@ -51,6 +51,10 @@ public class ContactRepository {
         return contacts;
     }
 
+    public void deleteAll(){
+
+        mDatabase.delete(DataBaseSchema.ContactTable.Name,null,null);
+    }
 
 
 
@@ -64,6 +68,19 @@ public class ContactRepository {
         try {
             contactCursorWrapper.moveToFirst();
             return contactCursorWrapper.getContact();
+        }finally {
+            contactCursorWrapper.close();;
+        }
+    }
+    public boolean is_exist(String contact_id){
+        String selection= DataBaseSchema.ContactTable.ContactCols.contact_id+" =? ";
+        String[] selectionArgs=new String[]{contact_id};
+        ContactCursorWrapper contactCursorWrapper= getContactCursorWrapper(selection,selectionArgs);
+        if (contactCursorWrapper==null     ||  contactCursorWrapper.getCount()==0)
+            return false;
+        try {
+            contactCursorWrapper.moveToFirst();
+            return true;
         }finally {
             contactCursorWrapper.close();;
         }
