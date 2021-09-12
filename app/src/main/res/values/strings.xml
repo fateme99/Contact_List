@@ -2,4 +2,8 @@
     <string name="app_name">Contact_List</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="empty_box">You dont have any task...</string>
+    <string name="contact_id">Contact ID :</string>
+    <string name="contact_display_name">Contact Display Name :</string>
+    <string name="contact_phone_number">Contact phone number :</string>
 </resources>

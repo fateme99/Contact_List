@@ -1,5 +1,6 @@
 package com.example.contact_list.controller;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -7,6 +8,7 @@ import androidx.fragment.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.example.contact_list.R;
 
@@ -30,5 +32,11 @@ public class ContactListActivity extends AppCompatActivity {
                     commit();
         }
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,  String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Toast.makeText(this, "on request permission", Toast.LENGTH_SHORT).show();
     }
 }

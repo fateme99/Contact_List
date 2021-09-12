@@ -18,6 +18,8 @@ import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,7 +43,8 @@ public class ContactListFragment extends Fragment {
     private ContactAdapter mContactAdapter;
     private List<Contact> mContacts;
     private ContactRepository mContactRepository;
-
+    private FrameLayout mFrameLayout_recycler;
+    private LinearLayout mLayout_empty;
     public ContactListFragment() {
         // Required empty public constructor
     }
@@ -84,6 +87,8 @@ public class ContactListFragment extends Fragment {
 
     private void findViews(View view) {
         mRecyclerView_contact = view.findViewById(R.id.contact_list_recycler_view);
+        mLayout_empty =view.findViewById(R.id.empty_layout);
+        mFrameLayout_recycler=view.findViewById(R.id.recyclerLayout);
     }
 
     private void initView() {
@@ -95,15 +100,21 @@ public class ContactListFragment extends Fragment {
     private void updateView() {
         mContactRepository = ContactRepository.getInstance(getActivity());
         mContacts = mContactRepository.getContacts();
-
-
-        if (mContactAdapter == null) {
-            mContactAdapter = new ContactAdapter(mContacts);
-            mRecyclerView_contact.setAdapter(mContactAdapter);
+        if (mContacts.size()==0){
+            mLayout_empty.setVisibility(View.VISIBLE);
+            mFrameLayout_recycler.setVisibility(View.GONE);
         }
-        mContactAdapter.setContacts(mContacts);
-        mContactAdapter.notifyDataSetChanged();
+        else {
+            mLayout_empty.setVisibility(View.GONE);
+            mFrameLayout_recycler.setVisibility(View.VISIBLE);
 
+            if (mContactAdapter == null) {
+                mContactAdapter = new ContactAdapter(mContacts);
+                mRecyclerView_contact.setAdapter(mContactAdapter);
+            }
+            mContactAdapter.setContacts(mContacts);
+            mContactAdapter.notifyDataSetChanged();
+        }
 
     }
 
@@ -131,19 +142,42 @@ public class ContactListFragment extends Fragment {
         getActivity().startService(intent);
 
         ContentResolver contentResolver = getActivity().getContentResolver();
-        Cursor cursor = contentResolver.
-                query(ContactsContract.Contacts.CONTENT_URI,
-                        null, null, null, null);
+        try {
+            Cursor cursor = contentResolver.
+                    query(ContactsContract.Contacts.CONTENT_URI,
+                            null, null, null, null);
 
-        if (cursor != null && cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            while (cursor.moveToNext()) {
-                String contact_id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-                String disPlay_name = cursor.
-                        getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                while (cursor.moveToNext()) {
+                    String contact_NO="";
+                    String contact_id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                    String disPlay_name = cursor.
+                            getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 
 
-                int has_phoneNumber = Integer.parseInt(cursor.
+                    if (Integer.parseInt(cursor.getString
+                            (cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)))>0){
+                        Cursor cursor1=contentResolver.
+                                query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                                        null,
+                                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                                        new String[]{contact_id},
+                                        null);
+                        if (cursor1 != null) {
+                            while (cursor1.moveToNext()) {
+                                contact_NO = cursor1.getString(cursor1.
+                                        getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                                if (contact_NO != null && contact_NO.length() > 0) {
+                                    contact_NO = contact_NO.replace(" ", "");
+                                }
+
+
+                            }
+                            cursor1.close();
+                        }
+                    }
+                /*int has_phoneNumber = Integer.parseInt(cursor.
                         getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
                 List<String> phone_NOs = new ArrayList<>();
                 if (has_phoneNumber > 0) {
@@ -163,21 +197,27 @@ public class ContactListFragment extends Fragment {
                     cursor2.close();
 
 
-                }
+                }*/
 
-                Contact contact = new Contact(contact_id, disPlay_name, "123");
-                if (!mContactRepository.is_exist(contact_id)) {
-                    mContactRepository.insert(contact);
+                    Contact contact = new Contact(contact_id, disPlay_name, contact_NO);
+                    if (!mContactRepository.is_exist(contact_id)) {
+                        mContactRepository.insert(contact);
+                    }
+
+
                 }
+                cursor.close();
 
 
             }
-            cursor.close();
-
-
+        }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-    }
+
+
 
     private class ContactHolder extends RecyclerView.ViewHolder {
         private TextView mTextView_display_name;
@@ -246,6 +286,7 @@ public class ContactListFragment extends Fragment {
             updateView();
         }
     }
+
 
     @Override
     public void onResume() {

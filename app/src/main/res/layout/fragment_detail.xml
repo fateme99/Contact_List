@@ -12,7 +12,7 @@
         android:textColor="@color/black"
         android:padding="8dp"
         android:textSize="18sp"
-        android:text="Contact ID : "
+        android:text="@string/contact_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <TextView
@@ -26,7 +26,7 @@
         android:textColor="@color/black"
         android:padding="8dp"
         android:textSize="18sp"
-        android:text="Contact Display Name : "
+        android:text="@string/contact_display_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <TextView
@@ -40,7 +40,7 @@
         android:textColor="@color/black"
         android:padding="8dp"
         android:textSize="18sp"
-        android:text="Contact phone number : "
+        android:text="@string/contact_phone_number"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <TextView
