@@ -53,7 +53,7 @@
 
     <Button
         android:id="@+id/ok_btn"
-        android:text="ok"
+        android:text="@string/ok"
         android:textColor="@color/black"
         android:backgroundTint="@color/light_green"
         android:layout_width="wrap_content"

@@ -25,30 +25,23 @@ public class ContactContentObserver extends ContentObserver {
         mContext = context;
         mContactRepository=ContactRepository.getInstance(mContext);
     }
-
-
     @Override
     public void onChange(boolean selfChange, @Nullable Uri uri) {
         super.onChange(selfChange, uri);
         if (!selfChange){
-
             ContactUpdate contactUpdate=new ContactUpdate();
             contactUpdate.doInBackground();
         }
     }
-
     private class ContactUpdate extends AsyncTask<Void,Void,Void>{
-
         @Override
         protected Void doInBackground(Void... voids) {
             updateAllContacts();
             return null;
         }
-
         @Override
         protected void onPostExecute(Void unused) {
             super.onPostExecute(unused);
-
         }
     }
     private void updateAllContacts(){
@@ -58,7 +51,6 @@ public class ContactContentObserver extends ContentObserver {
             Cursor cursor = contentResolver.
                     query(ContactsContract.Contacts.CONTENT_URI,
                             null, null, null, null);
-
             if (cursor != null && cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 while (cursor.moveToNext()) {
@@ -66,8 +58,6 @@ public class ContactContentObserver extends ContentObserver {
                     String contact_id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
                     String disPlay_name = cursor.
                             getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-
-
                     if (Integer.parseInt(cursor.getString
                             (cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)))>0){
                         Cursor cursor1=contentResolver.
@@ -83,23 +73,16 @@ public class ContactContentObserver extends ContentObserver {
                                 if (contact_NO != null && contact_NO.length() > 0) {
                                     contact_NO = contact_NO.replace(" ", "");
                                 }
-
-
                             }
                             cursor1.close();
                         }
                     }
-
                     Contact contact = new Contact(contact_id, disPlay_name, contact_NO);
                     if (!mContactRepository.is_exist(contact_id)) {
                         mContactRepository.insert(contact);
                     }
-
-
                 }
                 cursor.close();
-
-
             }
         }
         catch (Exception e) {

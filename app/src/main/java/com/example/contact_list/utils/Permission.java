@@ -22,7 +22,6 @@ public class Permission {
         }
         return result;
     }
-
     public static void getContactPermission(Context context, String permission) {
         String[] permissions = {permission};
         ActivityCompat.requestPermissions((Activity) context, permissions, REQUEST_CODE_CONTACT_PERMISSION);

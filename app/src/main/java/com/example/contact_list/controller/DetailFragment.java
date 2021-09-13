@@ -21,11 +21,8 @@ public class DetailFragment extends DialogFragment {
     private TextView mTextView_id,mTextView_display_name,mTextView_phone;
     private Button mButton_ok;
     public DetailFragment() {
-        // Required empty public constructor
+
     }
-
-
-
     public static DetailFragment newInstance(Contact contact) {
         DetailFragment fragment = new DetailFragment();
         Bundle args = new Bundle();
@@ -33,7 +30,6 @@ public class DetailFragment extends DialogFragment {
         fragment.setArguments(args);
         return fragment;
     }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,8 +37,6 @@ public class DetailFragment extends DialogFragment {
             mContact= (Contact) getArguments().getSerializable(ARGS_CONTACT);
         }
     }
-
-
     @Override
     public Dialog onCreateDialog( Bundle savedInstanceState) {
         LayoutInflater inflater=LayoutInflater.from(getActivity());

@@ -31,18 +31,13 @@ public class ContactListActivity extends AppCompatActivity {
 
         if (!hasContactPermission(this,Manifest.permission.READ_CONTACTS)) {
             getContactPermission(this,Manifest.permission.READ_CONTACTS);
-
         } else {
             startFragment();
-
         }
-
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
         if (requestCode == REQUEST_CODE_CONTACT_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "allowed...", Toast.LENGTH_SHORT).show();
             startFragment();

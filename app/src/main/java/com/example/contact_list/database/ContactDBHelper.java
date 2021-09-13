@@ -12,7 +12,6 @@ public class ContactDBHelper extends SQLiteOpenHelper {
     public ContactDBHelper(@Nullable Context context) {
         super(context, DataBaseSchema.Name,null, DataBaseSchema.version);
     }
-
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         StringBuilder sbContact=new StringBuilder();
@@ -22,17 +21,7 @@ public class ContactDBHelper extends SQLiteOpenHelper {
         sbContact.append(ContactTable.ContactCols.phone_NO+" INTEGER ");
         sbContact.append(");");
         sqLiteDatabase.execSQL(sbContact.toString());
-
-        /*StringBuilder sbPhone=new StringBuilder();
-        sbPhone.append("CREATE TABLE "+DataBaseSchema.PhoneTable.Name+"( ");
-        sbPhone.append(PhoneTable.PhoneNOCols.phone_NO +" INTEGER PRIMARY KEY AUTOINCREMENT ,");
-        sbPhone.append(PhoneTable.PhoneNOCols.contact_id +" INTEGER ");
-        sbPhone.append(");");
-        sqLiteDatabase.execSQL(sbContact.toString());*/
-
-
     }
-
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
 

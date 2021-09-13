@@ -10,7 +10,6 @@ public class ContactCursorWrapper extends CursorWrapper {
     public ContactCursorWrapper(Cursor cursor) {
         super(cursor);
     }
-
     public Contact getContact(){
         String id=getString(getColumnIndex(DataBaseSchema.ContactTable.ContactCols.contact_id));
         String display_name=getString(getColumnIndex(DataBaseSchema.ContactTable.ContactCols.display_name));

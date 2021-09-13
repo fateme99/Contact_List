@@ -59,9 +59,6 @@ public class ContactWatchService extends Service {
             e.printStackTrace();
         }
     }
-
-
-
     @Override
     public void onCreate() {
 
@@ -81,7 +78,4 @@ public class ContactWatchService extends Service {
 
         return START_STICKY;
     }
-
-
-
 }
