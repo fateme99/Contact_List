@@ -5,11 +5,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,20 +16,13 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import com.example.contact_list.R;
 import com.example.contact_list.model.Contact;
 import com.example.contact_list.repository.ContactRepository;
 import com.example.contact_list.service.ContactWatchService;
-
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ContactListFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ContactListFragment extends Fragment {
     private static final String TAG_FRAGMENT_DETAIL = "detailContact";
     private RecyclerView mRecyclerView_contact;

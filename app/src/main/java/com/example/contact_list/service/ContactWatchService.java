@@ -1,10 +1,7 @@
 package com.example.contact_list.service;
 
 import android.app.Service;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -13,15 +10,9 @@ import android.os.Message;
 import android.os.Process;
 import android.provider.ContactsContract;
 import android.widget.Toast;
-
 import androidx.annotation.Nullable;
-
-import com.example.contact_list.model.Contact;
 import com.example.contact_list.repository.ContactRepository;
 import com.example.contact_list.utils.ContactContentObserver;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ContactWatchService extends Service {
     private ContactRepository mContactRepository;

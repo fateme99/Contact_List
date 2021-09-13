@@ -8,9 +8,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.provider.ContactsContract;
-
 import androidx.annotation.Nullable;
-
 import com.example.contact_list.model.Contact;
 import com.example.contact_list.repository.ContactRepository;
 

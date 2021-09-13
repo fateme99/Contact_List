@@ -1,20 +1,15 @@
 package com.example.contact_list.controller;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.widget.ProgressBar;
 import android.widget.Toast;
-
 import com.example.contact_list.R;
-
 import static com.example.contact_list.utils.Permission.REQUEST_CODE_CONTACT_PERMISSION;
 import static com.example.contact_list.utils.Permission.getContactPermission;
 import static com.example.contact_list.utils.Permission.hasContactPermission;

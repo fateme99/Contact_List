@@ -3,17 +3,13 @@ package com.example.contact_list.controller;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
-
 import androidx.fragment.app.DialogFragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
 import com.example.contact_list.R;
 import com.example.contact_list.model.Contact;
-
 
 public class DetailFragment extends DialogFragment {
     private static final String ARGS_CONTACT = "contact";

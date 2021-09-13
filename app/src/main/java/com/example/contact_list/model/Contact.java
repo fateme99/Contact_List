@@ -1,7 +1,6 @@
 package com.example.contact_list.model;
 
 import java.io.Serializable;
-import java.util.List;
 
 public class Contact implements Serializable {
     private String mID;

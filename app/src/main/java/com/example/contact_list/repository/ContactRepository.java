@@ -4,15 +4,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-
 import com.example.contact_list.database.ContactDBHelper;
 import com.example.contact_list.database.DataBaseSchema;
 import com.example.contact_list.model.Contact;
-
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class ContactRepository {
 
