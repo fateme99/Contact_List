@@ -5,17 +5,14 @@ import android.content.Context;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.provider.ContactsContract;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
 import com.example.contact_list.model.Contact;
 import com.example.contact_list.repository.ContactRepository;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ContactContentObserver extends ContentObserver {
     private Context mContext;
@@ -34,57 +31,79 @@ public class ContactContentObserver extends ContentObserver {
     public void onChange(boolean selfChange, @Nullable Uri uri) {
         super.onChange(selfChange, uri);
         if (!selfChange){
-            updateRepository();
+
+            ContactUpdate contactUpdate=new ContactUpdate();
+            contactUpdate.doInBackground();
         }
     }
-    private void updateRepository(){
+
+    private class ContactUpdate extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            updateAllContacts();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+
+        }
+    }
+    private void updateAllContacts(){
         ContentResolver contentResolver = mContext.getContentResolver();
-        Cursor cursor = contentResolver.
-                query(ContactsContract.Contacts.CONTENT_URI,
-                        null, null, null, null);
-
         mContactRepository.deleteAll();
-        if (cursor != null && cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            while (cursor.moveToNext()) {
-                String contact_id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-                String disPlay_name = cursor.
-                        getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+        try {
+            Cursor cursor = contentResolver.
+                    query(ContactsContract.Contacts.CONTENT_URI,
+                            null, null, null, null);
+
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                while (cursor.moveToNext()) {
+                    String contact_NO="";
+                    String contact_id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                    String disPlay_name = cursor.
+                            getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 
 
-                int has_phoneNumber = Integer.parseInt(cursor.
-                        getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)));
-                List<String> phone_NOs = new ArrayList<>();
-                if (has_phoneNumber > 0) {
-                    Cursor cursor2 = contentResolver
-                            .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                                    null,
-                                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?",
-                                    new String[]{contact_id},
-                                    null);
+                    if (Integer.parseInt(cursor.getString
+                            (cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)))>0){
+                        Cursor cursor1=contentResolver.
+                                query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                                        null,
+                                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                                        new String[]{contact_id},
+                                        null);
+                        if (cursor1 != null) {
+                            while (cursor1.moveToNext()) {
+                                contact_NO = cursor1.getString(cursor1.
+                                        getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                                if (contact_NO != null && contact_NO.length() > 0) {
+                                    contact_NO = contact_NO.replace(" ", "");
+                                }
 
-                    cursor2.moveToFirst();
-                    while (cursor2.moveToNext()) {
-                        String phone_No = cursor2.
-                                getString(cursor2.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                        phone_NOs.add(phone_No);
+
+                            }
+                            cursor1.close();
+                        }
                     }
-                    cursor2.close();
+
+                    Contact contact = new Contact(contact_id, disPlay_name, contact_NO);
+                    if (!mContactRepository.is_exist(contact_id)) {
+                        mContactRepository.insert(contact);
+                    }
 
 
                 }
-
-                Contact contact = new Contact(contact_id, disPlay_name, "123");
-                if (!mContactRepository.is_exist(contact_id)){
-                    mContactRepository.insert(contact);
-                }
+                cursor.close();
 
 
             }
-            cursor.close();
-
-
         }
-        Toast.makeText(mContext, "repository updated...", Toast.LENGTH_SHORT).show();
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -1,15 +1,11 @@
 package com.example.contact_list.controller;
 
-import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.os.Build;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,8 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.contact_list.R;
 import com.example.contact_list.model.Contact;
@@ -38,8 +34,8 @@ import java.util.List;
  */
 public class ContactListFragment extends Fragment {
     private static final String TAG_FRAGMENT_DETAIL = "detailContact";
-
     private RecyclerView mRecyclerView_contact;
+    private ProgressBar mProgressBar;
     private ContactAdapter mContactAdapter;
     private List<Contact> mContacts;
     private ContactRepository mContactRepository;
@@ -62,9 +58,16 @@ public class ContactListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mContacts = new ArrayList<>();
         mContactRepository = ContactRepository.getInstance(getActivity());
+        ContactGetter contactGetter=new ContactGetter();
+        contactGetter.execute();
+
+
         if (getArguments() != null) {
 
         }
+
+
+
 
 
     }
@@ -79,10 +82,13 @@ public class ContactListFragment extends Fragment {
         return view;
     }
 
+
+
     private void findViews(View view) {
         mRecyclerView_contact = view.findViewById(R.id.contact_list_recycler_view);
         mLayout_empty =view.findViewById(R.id.empty_layout);
         mFrameLayout_recycler=view.findViewById(R.id.recyclerLayout);
+        mProgressBar=view.findViewById(R.id.progressbar);
     }
 
     private void initView() {
@@ -92,14 +98,14 @@ public class ContactListFragment extends Fragment {
     }
 
     private void updateView() {
-        getAllContacts();
+
         mContactRepository = ContactRepository.getInstance(getActivity());
         mContacts = mContactRepository.getContacts();
-        if (mContacts.size()==0){
+        if (mContacts.size()==0 && mProgressBar.getVisibility()==View.GONE){
             mLayout_empty.setVisibility(View.VISIBLE);
             mFrameLayout_recycler.setVisibility(View.GONE);
         }
-        else {
+        else if (mProgressBar.getVisibility()==View.GONE){
             mLayout_empty.setVisibility(View.GONE);
             mFrameLayout_recycler.setVisibility(View.VISIBLE);
 
@@ -240,8 +246,22 @@ public class ContactListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
         updateView();
-        Toast.makeText(getActivity(), "onresumed update..", Toast.LENGTH_SHORT).show();
+
+    }
+    private class ContactGetter extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            getAllContacts();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            mProgressBar.setVisibility(View.GONE);
+            updateView();
+            super.onPostExecute(unused);
+        }
     }
 }

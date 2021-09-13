@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.contact_list.R;
@@ -19,7 +20,6 @@ import static com.example.contact_list.utils.Permission.getContactPermission;
 import static com.example.contact_list.utils.Permission.hasContactPermission;
 
 public class ContactListActivity extends AppCompatActivity {
-
     public  static Intent newIntent(Context context){
         Intent intent=new Intent(context,ContactListActivity.class);
         return intent;

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    android:gravity="center"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,7 +9,7 @@
     tools:context=".controller.ContactListFragment">
 
     <FrameLayout
-        android:visibility="visible"
+        android:visibility="gone"
         android:id="@+id/recyclerLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -48,6 +50,11 @@
             android:textSize="24sp" />
 
     </LinearLayout>
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:visibility="visible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
 
 </LinearLayout>
