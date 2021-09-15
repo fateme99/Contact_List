@@ -4,13 +4,12 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.contact_list.utils.ApplicationLoader;
 import com.example.contact_list.database.DataBaseSchema.*;
-
-import androidx.annotation.Nullable;
 
 public class ContactDBHelper extends SQLiteOpenHelper {
 
-    public ContactDBHelper(@Nullable Context context) {
+    public ContactDBHelper(Context context) {
         super(context, DataBaseSchema.Name, null, DataBaseSchema.version);
     }
 

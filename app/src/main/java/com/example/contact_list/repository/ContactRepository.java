@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.example.contact_list.utils.ApplicationLoader;
 import com.example.contact_list.database.ContactDBHelper;
 import com.example.contact_list.database.DataBaseSchema;
 import com.example.contact_list.model.Contact;
@@ -13,20 +14,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ContactRepository {
-
-    private static ContactRepository sInstance;
-    private SQLiteDatabase mDatabase;
     private Context mContext;
+    private static volatile ContactRepository sInstance;
+    private SQLiteDatabase mDatabase;
 
     private ContactRepository(Context context) {
-        mContext = context.getApplicationContext();
-        ContactDBHelper contactDBHelper = new ContactDBHelper(mContext);
+        ContactDBHelper contactDBHelper = new ContactDBHelper(context);
         mDatabase = contactDBHelper.getWritableDatabase();
+        mContext=context;
+
     }
 
     public static ContactRepository getInstance(Context context) {
-        if (sInstance == null)
-            sInstance = new ContactRepository(context);
+        if (sInstance == null) {
+            synchronized (ContactRepository .class) {
+                if (sInstance == null) {
+                    sInstance = new ContactRepository(context);
+                }
+            }
+        }
         return sInstance;
     }
 

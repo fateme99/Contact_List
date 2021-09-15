@@ -1,15 +1,15 @@
 package com.example.contact_list.controller.list;
 
 import android.content.ContentResolver;
-import android.content.Intent;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,14 +19,16 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.contact_list.utils.MyLog;
 import com.example.contact_list.R;
 import com.example.contact_list.controller.detail.DetailFragment;
 import com.example.contact_list.model.Contact;
 import com.example.contact_list.repository.ContactRepository;
-import com.example.contact_list.service.ContactWatchService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class ContactListFragment extends Fragment {
     private static final String TAG_FRAGMENT_DETAIL = "detailContact";
@@ -54,8 +56,10 @@ public class ContactListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mContacts = new ArrayList<>();
         mContactRepository = ContactRepository.getInstance(getActivity());
-        ContactGetter contactGetter = new ContactGetter();
-        contactGetter.execute();
+        contactGetter();
+        /*ContactGetter contactGetter = new ContactGetter();
+        contactGetter.execute();*/
+
     }
 
     @Override
@@ -100,8 +104,7 @@ public class ContactListFragment extends Fragment {
     }
 
     private void getAllContacts() {
-        Intent intent = new Intent(getActivity(), ContactWatchService.class);
-        getActivity().startService(intent);
+
         ContentResolver contentResolver = getActivity().getContentResolver();
         try {
             Cursor cursorContact = contentResolver.
@@ -141,7 +144,7 @@ public class ContactListFragment extends Fragment {
                 cursorContact.close();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            MyLog.e(e);
         }
     }
 
@@ -174,10 +177,6 @@ public class ContactListFragment extends Fragment {
             mContacts = contacts;
         }
 
-        public List<Contact> getContacts() {
-            return mContacts;
-        }
-
         public void setContacts(List<Contact> contacts) {
             mContacts = contacts;
         }
@@ -204,9 +203,9 @@ public class ContactListFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        mProgressBar.setVisibility(View.VISIBLE);
+        /*mProgressBar.setVisibility(View.VISIBLE);
         mFrameLayoutRecycler.setVisibility(View.GONE);
-        mLayoutEmpty.setVisibility(View.GONE);
+        mLayoutEmpty.setVisibility(View.GONE);*/
     }
 
     @Override
@@ -215,19 +214,20 @@ public class ContactListFragment extends Fragment {
         updateView();
     }
 
-    private class ContactGetter extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            getAllContacts();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void unused) {
+    private void contactGetter() {
+        Executor executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                getAllContacts();
+            }
+        });
+        handler.post(() -> {
             mProgressBar.setVisibility(View.GONE);
             updateView();
-            super.onPostExecute(unused);
-        }
+        });
     }
+
+
 }

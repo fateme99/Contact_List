@@ -8,35 +8,34 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.provider.ContactsContract;
-import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
 import com.example.contact_list.model.Contact;
 import com.example.contact_list.repository.ContactRepository;
 
-import java.util.concurrent.CountDownLatch;
-
 public class ContactContentObserver extends ContentObserver {
-    private Context mContext;
     private ContactRepository mContactRepository;
-
+    private Context mContext;
     public ContactContentObserver(Handler handler) {
         super(handler);
-    }
 
-    public ContactContentObserver(Handler handler, Context context) {
+    }
+    public ContactContentObserver(Handler handler,Context context) {
         super(handler);
-        mContext = context;
-        mContactRepository = ContactRepository.getInstance(mContext);
+        mContactRepository = ContactRepository.getInstance(context);
+        mContext=context;
     }
 
     @Override
     public void onChange(boolean selfChange, @Nullable Uri uri) {
         super.onChange(selfChange, uri);
         if (!selfChange) {
+            Toast.makeText(mContext, "changed", Toast.LENGTH_SHORT).show();
             ContactUpdate contactUpdate = new ContactUpdate();
             contactUpdate.execute();
+
         }
     }
 
@@ -44,7 +43,7 @@ public class ContactContentObserver extends ContentObserver {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            updateAllContacts();
+            updateAllContacts(mContext);
             return null;
         }
 
@@ -55,8 +54,8 @@ public class ContactContentObserver extends ContentObserver {
         }
     }
 
-    private void updateAllContacts() {
-        ContentResolver contentResolver = mContext.getContentResolver();
+    private void updateAllContacts(Context context) {
+        ContentResolver contentResolver = context.getContentResolver();
         mContactRepository.deleteAll();
         try {
             Cursor cursor = contentResolver.
@@ -96,7 +95,7 @@ public class ContactContentObserver extends ContentObserver {
                 cursor.close();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            MyLog.e(e);
         }
     }
 

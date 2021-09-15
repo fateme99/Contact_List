@@ -8,20 +8,20 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.ContentObserver;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.ContactsContract;
 import android.widget.Toast;
 
 import com.example.contact_list.R;
+import com.example.contact_list.utils.ContactContentObserver;
+import com.example.contact_list.utils.MyLog;
 import com.example.contact_list.utils.Permission;
 
 import static com.example.contact_list.utils.Permission.REQUEST_CODE_CONTACT_PERMISSION;
 
 public class ContactListActivity extends AppCompatActivity {
-    public static Intent newIntent(Context context) {
-        Intent intent = new Intent(context, ContactListActivity.class);
-        return intent;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,7 +31,10 @@ public class ContactListActivity extends AppCompatActivity {
             Permission.getContactPermission(this, Manifest.permission.READ_CONTACTS);
         } else {
             startFragment();
+            setContactObserver();
+
         }
+
     }
 
     @Override
@@ -39,6 +42,7 @@ public class ContactListActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODE_CONTACT_PERMISSION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             startFragment();
+            setContactObserver();
 
         } else {
             Toast.makeText(this, R.string.give_permission_toast, Toast.LENGTH_SHORT).show();
@@ -53,6 +57,19 @@ public class ContactListActivity extends AppCompatActivity {
                     beginTransaction().
                     add(R.id.container_fragment, ContactListFragment.newInstance()).
                     commit();
+        }
+    }
+
+    private void setContactObserver() {
+        try {
+
+            getApplication().
+                    getContentResolver().
+                    registerContentObserver(ContactsContract.Contacts.CONTENT_URI,
+                            true,
+                            new ContactContentObserver(new Handler(),this));
+        } catch (Exception e) {
+            MyLog.e(e);
         }
     }
 
