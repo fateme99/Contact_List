@@ -10,12 +10,14 @@ import android.os.Message;
 import android.os.Process;
 import android.provider.ContactsContract;
 import android.widget.Toast;
+
 import androidx.annotation.Nullable;
+
 import com.example.contact_list.repository.ContactRepository;
 import com.example.contact_list.utils.ContactContentObserver;
 
 public class ContactWatchService extends Service {
-    private ContactRepository mContactRepository;
+    public static final String handlerThreadName = "ServiceStartArguments";
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
 
@@ -24,10 +26,12 @@ public class ContactWatchService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
+
     private final class ServiceHandler extends Handler {
         public ServiceHandler(Looper looper) {
             super(looper);
         }
+
         @Override
         public void handleMessage(Message msg) {
             try {
@@ -37,29 +41,31 @@ public class ContactWatchService extends Service {
             }
         }
     }
-    private void startContactObserver(){
-        try{
-            Toast.makeText(getApplicationContext(),"ContactWatchService Started",Toast.LENGTH_SHORT).show();
+
+    private void startContactObserver() {
+        try {
 
             getApplication().
                     getContentResolver().
                     registerContentObserver(ContactsContract.Contacts.CONTENT_URI,
                             true,
-                            new ContactContentObserver(new Handler(),getApplicationContext()));
-        }catch (Exception e){
+                            new ContactContentObserver(new Handler(), getApplicationContext()));
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     @Override
     public void onCreate() {
 
-        HandlerThread thread = new HandlerThread("ServiceStartArguments",
+        HandlerThread thread = new HandlerThread(handlerThreadName,
                 Process.THREAD_PRIORITY_BACKGROUND);
         thread.start();
 
         mServiceLooper = thread.getLooper();
         mServiceHandler = new ServiceHandler(mServiceLooper);
     }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 

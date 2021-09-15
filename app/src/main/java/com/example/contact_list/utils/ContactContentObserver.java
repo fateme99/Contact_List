@@ -8,41 +8,54 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.provider.ContactsContract;
+import android.view.View;
+
 import androidx.annotation.Nullable;
+
 import com.example.contact_list.model.Contact;
 import com.example.contact_list.repository.ContactRepository;
+
+import java.util.concurrent.CountDownLatch;
 
 public class ContactContentObserver extends ContentObserver {
     private Context mContext;
     private ContactRepository mContactRepository;
+
     public ContactContentObserver(Handler handler) {
         super(handler);
     }
+
     public ContactContentObserver(Handler handler, Context context) {
         super(handler);
         mContext = context;
-        mContactRepository=ContactRepository.getInstance(mContext);
+        mContactRepository = ContactRepository.getInstance(mContext);
     }
+
     @Override
     public void onChange(boolean selfChange, @Nullable Uri uri) {
         super.onChange(selfChange, uri);
-        if (!selfChange){
-            ContactUpdate contactUpdate=new ContactUpdate();
-            contactUpdate.doInBackground();
+        if (!selfChange) {
+            ContactUpdate contactUpdate = new ContactUpdate();
+            contactUpdate.execute();
         }
     }
-    private class ContactUpdate extends AsyncTask<Void,Void,Void>{
+
+    private class ContactUpdate extends AsyncTask<Void, Void, Void> {
+
         @Override
         protected Void doInBackground(Void... voids) {
             updateAllContacts();
             return null;
         }
+
         @Override
         protected void onPostExecute(Void unused) {
             super.onPostExecute(unused);
+
         }
     }
-    private void updateAllContacts(){
+
+    private void updateAllContacts() {
         ContentResolver contentResolver = mContext.getContentResolver();
         mContactRepository.deleteAll();
         try {
@@ -52,13 +65,13 @@ public class ContactContentObserver extends ContentObserver {
             if (cursor != null && cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 while (cursor.moveToNext()) {
-                    String contact_NO="";
+                    String contact_NO = "";
                     String contact_id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
                     String disPlay_name = cursor.
                             getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
                     if (Integer.parseInt(cursor.getString
-                            (cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)))>0){
-                        Cursor cursor1=contentResolver.
+                            (cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
+                        Cursor cursor1 = contentResolver.
                                 query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                                         null,
                                         ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
@@ -82,9 +95,9 @@ public class ContactContentObserver extends ContentObserver {
                 }
                 cursor.close();
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 }

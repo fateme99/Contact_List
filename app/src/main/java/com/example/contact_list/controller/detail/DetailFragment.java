@@ -1,4 +1,4 @@
-package com.example.contact_list.controller;
+package com.example.contact_list.controller.detail;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -14,8 +14,8 @@ import com.example.contact_list.model.Contact;
 public class DetailFragment extends DialogFragment {
     private static final String ARGS_CONTACT = "contact";
     private Contact mContact;
-    private TextView mTextView_id,mTextView_display_name,mTextView_phone;
-    private Button mButton_ok;
+    private TextView mTextViewId, mTextViewDisplayName, mTextViewPhone;
+    private Button mButtonOk;
     public DetailFragment() {
 
     }
@@ -41,24 +41,24 @@ public class DetailFragment extends DialogFragment {
         setValues();
         setListeners();
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-                .setTitle("Contact Detail")
+                .setTitle(R.string.contact_detail)
                 .setView(view);
         AlertDialog dialog=builder.create();
         return dialog;
     }
     private void findViews(View view){
-        mTextView_id=view.findViewById(R.id.contact_id_txt);
-        mTextView_display_name=view.findViewById(R.id.contact_display_name_txt);
-        mTextView_phone=view.findViewById(R.id.contact_phone_number);
-        mButton_ok=view.findViewById(R.id.ok_btn);
+        mTextViewId =view.findViewById(R.id.contact_id_txt);
+        mTextViewDisplayName =view.findViewById(R.id.contact_display_name_txt);
+        mTextViewPhone =view.findViewById(R.id.contact_phone_number);
+        mButtonOk =view.findViewById(R.id.ok_btn);
     }
     private void setValues(){
-        mTextView_id.setText(mContact.getID());
-        mTextView_display_name.setText(mContact.getName_Display());
-        mTextView_phone.setText(mContact.getPhone_NO());
+        mTextViewId.setText(mContact.getId());
+        mTextViewDisplayName.setText(mContact.getNameDisplay());
+        mTextViewPhone.setText(mContact.getPhoneNO());
     }
     private void setListeners(){
-        mButton_ok.setOnClickListener(new View.OnClickListener() {
+        mButtonOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 getDialog().dismiss();
