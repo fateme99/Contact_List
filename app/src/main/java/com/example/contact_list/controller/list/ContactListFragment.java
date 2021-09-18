@@ -11,12 +11,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.ContactsContract;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.contact_list.utils.MyLog;
@@ -24,7 +27,6 @@ import com.example.contact_list.R;
 import com.example.contact_list.controller.detail.DetailFragment;
 import com.example.contact_list.model.Contact;
 import com.example.contact_list.repository.ContactRepository;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -65,10 +67,73 @@ public class ContactListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_contact_list, container, false);
-        findViews(view);
+        //View view = inflater.inflate(R.layout.fragment_contact_list, container, false);
+        View view = setViewDynamically();
+        //findViews(view);
         initView();
         return view;
+    }
+
+    private View setViewDynamically() {
+        LinearLayout linearLayout = new LinearLayout(getActivity());
+
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.setGravity(Gravity.CENTER);
+
+        mFrameLayoutRecycler = new FrameLayout(getActivity());
+        mFrameLayoutRecycler.setLayoutParams(new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        ));
+        mFrameLayoutRecycler.setVisibility(View.GONE);
+
+        mRecyclerViewContact=new RecyclerView(getActivity());
+        mRecyclerViewContact.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        ));
+        mFrameLayoutRecycler.addView(mRecyclerViewContact);
+        linearLayout.addView(mFrameLayoutRecycler);
+
+        mLayoutEmpty=new LinearLayout(getActivity());
+        mLayoutEmpty.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        ));
+        mLayoutEmpty.setOrientation(LinearLayout.VERTICAL);
+        mLayoutEmpty.setGravity(Gravity.CENTER);
+        mLayoutEmpty.setVisibility(View.GONE);
+        ImageView imageView=new ImageView(getActivity());
+        imageView.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        ));
+
+        imageView.setImageResource(R.drawable.ic_empty_icon);
+        mLayoutEmpty.addView(imageView);
+
+        TextView textView=new TextView(getActivity());
+        LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(0, 20, 0, 0);
+        textView.setText(R.string.empty_box);
+        textView.setTextSize(24);
+        textView.setLayoutParams(params);
+
+        mLayoutEmpty.addView(textView);
+
+        linearLayout.addView(mLayoutEmpty);
+
+        mProgressBar=new ProgressBar(getActivity());
+        mProgressBar.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        ));
+        mProgressBar.setVisibility(View.VISIBLE);
+        linearLayout.addView(mProgressBar);
+        return linearLayout;
     }
 
     private void findViews(View view) {
@@ -215,14 +280,18 @@ public class ContactListFragment extends Fragment {
     }
 
     private void contactGetter() {
-        Executor executor = Executors.newSingleThreadExecutor();
+
+        Executor executor = Executors.newCachedThreadPool();
+
         Handler handler = new Handler(Looper.getMainLooper());
-        executor.execute(new Runnable() {
+        Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 getAllContacts();
             }
-        });
+        };
+
+        executor.execute(runnable);
         handler.post(() -> {
             mProgressBar.setVisibility(View.GONE);
             updateView();
