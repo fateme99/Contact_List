@@ -26,6 +26,7 @@ import com.example.contact_list.repository.ContactRepository;
 import com.example.contact_list.utils.ContactContentObserver;
 import com.example.contact_list.utils.MyLog;
 import com.example.contact_list.utils.Permission;
+import com.example.contact_list.view.ProgressBarView;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -33,7 +34,7 @@ import java.util.concurrent.Executors;
 import static com.example.contact_list.utils.Permission.REQUEST_CODE_CONTACT_PERMISSION;
 
 public class ContactListActivity extends AppCompatActivity {
-    private ProgressBar mProgressBar;
+    private ProgressBarView mProgressBar;
     private ContactRepository mContactRepository;
     private FrameLayout mFrameLayout;
 

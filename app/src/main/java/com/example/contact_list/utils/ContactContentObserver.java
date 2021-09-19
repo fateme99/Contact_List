@@ -47,8 +47,6 @@ public class ContactContentObserver extends ContentObserver {
 
     private void contactGetter(Context context) {
         Executor executor = Executors.newCachedThreadPool();
-
-
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -56,10 +54,7 @@ public class ContactContentObserver extends ContentObserver {
                 notifyToUI();
             }
         };
-
         executor.execute(runnable);
-
-
     }
 
     private void notifyToUI() {

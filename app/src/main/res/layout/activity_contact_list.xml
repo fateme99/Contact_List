@@ -15,7 +15,7 @@
         android:layout_height="match_parent">
 
     </FrameLayout>
-    <ProgressBar
+    <com.example.contact_list.view.ProgressBarView
         android:layout_gravity="center"
         android:id="@+id/progressbar"
         android:layout_width="wrap_content"
