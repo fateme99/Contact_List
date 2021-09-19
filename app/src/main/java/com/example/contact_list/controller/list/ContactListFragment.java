@@ -1,16 +1,10 @@
 package com.example.contact_list.controller.list;
 
-import android.content.ContentResolver;
-import android.database.Cursor;
-import android.os.Bundle;
-
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Handler;
-import android.os.Looper;
-import android.provider.ContactsContract;
+import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,24 +12,19 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.example.contact_list.utils.MyLog;
 import com.example.contact_list.R;
 import com.example.contact_list.controller.detail.DetailFragment;
 import com.example.contact_list.model.Contact;
 import com.example.contact_list.repository.ContactRepository;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 public class ContactListFragment extends Fragment {
     private static final String TAG_FRAGMENT_DETAIL = "detailContact";
     private RecyclerView mRecyclerViewContact;
-    private ProgressBar mProgressBar;
     private ContactAdapter mContactAdapter;
     private List<Contact> mContacts;
     private ContactRepository mContactRepository;
@@ -58,10 +47,6 @@ public class ContactListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mContacts = new ArrayList<>();
         mContactRepository = ContactRepository.getInstance(getActivity());
-        contactGetter();
-        /*ContactGetter contactGetter = new ContactGetter();
-        contactGetter.execute();*/
-
     }
 
     @Override
@@ -87,7 +72,7 @@ public class ContactListFragment extends Fragment {
         ));
         mFrameLayoutRecycler.setVisibility(View.GONE);
 
-        mRecyclerViewContact=new RecyclerView(getActivity());
+        mRecyclerViewContact = new RecyclerView(getActivity());
         mRecyclerViewContact.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
@@ -95,7 +80,7 @@ public class ContactListFragment extends Fragment {
         mFrameLayoutRecycler.addView(mRecyclerViewContact);
         linearLayout.addView(mFrameLayoutRecycler);
 
-        mLayoutEmpty=new LinearLayout(getActivity());
+        mLayoutEmpty = new LinearLayout(getActivity());
         mLayoutEmpty.setLayoutParams(new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
@@ -103,7 +88,7 @@ public class ContactListFragment extends Fragment {
         mLayoutEmpty.setOrientation(LinearLayout.VERTICAL);
         mLayoutEmpty.setGravity(Gravity.CENTER);
         mLayoutEmpty.setVisibility(View.GONE);
-        ImageView imageView=new ImageView(getActivity());
+        ImageView imageView = new ImageView(getActivity());
         imageView.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -112,8 +97,8 @@ public class ContactListFragment extends Fragment {
         imageView.setImageResource(R.drawable.ic_empty_icon);
         mLayoutEmpty.addView(imageView);
 
-        TextView textView=new TextView(getActivity());
-        LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(
+        TextView textView = new TextView(getActivity());
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
@@ -121,18 +106,8 @@ public class ContactListFragment extends Fragment {
         textView.setText(R.string.empty_box);
         textView.setTextSize(24);
         textView.setLayoutParams(params);
-
         mLayoutEmpty.addView(textView);
-
         linearLayout.addView(mLayoutEmpty);
-
-        mProgressBar=new ProgressBar(getActivity());
-        mProgressBar.setLayoutParams(new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        ));
-        mProgressBar.setVisibility(View.VISIBLE);
-        linearLayout.addView(mProgressBar);
         return linearLayout;
     }
 
@@ -140,7 +115,7 @@ public class ContactListFragment extends Fragment {
         mRecyclerViewContact = view.findViewById(R.id.contact_list_recycler_view);
         mLayoutEmpty = view.findViewById(R.id.empty_layout);
         mFrameLayoutRecycler = view.findViewById(R.id.recyclerLayout);
-        mProgressBar = view.findViewById(R.id.progressbar);
+
     }
 
     private void initView() {
@@ -152,10 +127,10 @@ public class ContactListFragment extends Fragment {
     private void updateView() {
         mContactRepository = ContactRepository.getInstance(getActivity());
         mContacts = mContactRepository.getContacts();
-        if (mContacts.size() == 0 && mProgressBar.getVisibility() == View.GONE) {
+        if (mContacts.size() == 0) {
             mLayoutEmpty.setVisibility(View.VISIBLE);
             mFrameLayoutRecycler.setVisibility(View.GONE);
-        } else if (mProgressBar.getVisibility() == View.GONE) {
+        } else {
             mLayoutEmpty.setVisibility(View.GONE);
             mFrameLayoutRecycler.setVisibility(View.VISIBLE);
 
@@ -165,51 +140,6 @@ public class ContactListFragment extends Fragment {
             }
             mContactAdapter.setContacts(mContacts);
             mContactAdapter.notifyDataSetChanged();
-        }
-    }
-
-    private void getAllContacts() {
-
-        ContentResolver contentResolver = getActivity().getContentResolver();
-        try {
-            Cursor cursorContact = contentResolver.
-                    query(ContactsContract.Contacts.CONTENT_URI,
-                            null, null, null, null);
-            if (cursorContact != null && cursorContact.getCount() > 0) {
-                cursorContact.moveToFirst();
-                while (cursorContact.moveToNext()) {
-                    String contactNumber = "";
-                    String contactId = cursorContact.getString(cursorContact.getColumnIndex(ContactsContract.Contacts._ID));
-                    String disPlayName = cursorContact.
-                            getString(cursorContact.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                    if (Integer.parseInt(cursorContact.getString
-                            (cursorContact.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
-                        Cursor cursorPhone = contentResolver.
-                                query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                                        null,
-                                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                                        new String[]{contactId},
-                                        null);
-                        if (cursorPhone != null) {
-                            while (cursorPhone.moveToNext()) {
-                                contactNumber = cursorPhone.getString(cursorPhone.
-                                        getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                                if (contactNumber != null && contactNumber.length() > 0) {
-                                    contactNumber = contactNumber.replace(" ", "");
-                                }
-                            }
-                            cursorPhone.close();
-                        }
-                    }
-                    Contact contact = new Contact(contactId, disPlayName, contactNumber);
-                    if (!mContactRepository.is_exist(contactId)) {
-                        mContactRepository.insert(contact);
-                    }
-                }
-                cursorContact.close();
-            }
-        } catch (Exception e) {
-            MyLog.e(e);
         }
     }
 
@@ -277,25 +207,6 @@ public class ContactListFragment extends Fragment {
     public void onResume() {
         super.onResume();
         updateView();
-    }
-
-    private void contactGetter() {
-
-        Executor executor = Executors.newCachedThreadPool();
-
-        Handler handler = new Handler(Looper.getMainLooper());
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                getAllContacts();
-            }
-        };
-
-        executor.execute(runnable);
-        handler.post(() -> {
-            mProgressBar.setVisibility(View.GONE);
-            updateView();
-        });
     }
 
 

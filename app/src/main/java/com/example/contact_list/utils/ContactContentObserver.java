@@ -7,7 +7,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.ContactsContract;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -15,17 +18,22 @@ import androidx.annotation.Nullable;
 import com.example.contact_list.model.Contact;
 import com.example.contact_list.repository.ContactRepository;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 public class ContactContentObserver extends ContentObserver {
     private ContactRepository mContactRepository;
     private Context mContext;
+
     public ContactContentObserver(Handler handler) {
         super(handler);
 
     }
-    public ContactContentObserver(Handler handler,Context context) {
+
+    public ContactContentObserver(Handler handler, Context context) {
         super(handler);
         mContactRepository = ContactRepository.getInstance(context);
-        mContext=context;
+        mContext = context;
     }
 
     @Override
@@ -33,25 +41,33 @@ public class ContactContentObserver extends ContentObserver {
         super.onChange(selfChange, uri);
         if (!selfChange) {
             Toast.makeText(mContext, "changed", Toast.LENGTH_SHORT).show();
-            ContactUpdate contactUpdate = new ContactUpdate();
-            contactUpdate.execute();
-
+            contactGetter(mContext);
         }
     }
 
-    private class ContactUpdate extends AsyncTask<Void, Void, Void> {
+    private void contactGetter(Context context) {
+        Executor executor = Executors.newCachedThreadPool();
 
-        @Override
-        protected Void doInBackground(Void... voids) {
-            updateAllContacts(mContext);
-            return null;
-        }
 
-        @Override
-        protected void onPostExecute(Void unused) {
-            super.onPostExecute(unused);
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                updateAllContacts(context);
+                notifyToUI();
+            }
+        };
 
-        }
+        executor.execute(runnable);
+
+
+    }
+
+    private void notifyToUI() {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(() -> {
+            // TODO: 9/19/2021 send main thread to show the list
+        });
+
     }
 
     private void updateAllContacts(Context context) {
