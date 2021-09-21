@@ -1,4 +1,4 @@
-package com.example.contact_list.controller;
+package com.example.contact_list.view;
 
 import android.os.Bundle;
 

@@ -1,27 +1,23 @@
-package com.example.contact_list.controller.permission;
+package com.example.contact_list.view.permission;
 
 import android.Manifest;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
-import com.airbnb.lottie.LottieAnimationView;
 import com.example.contact_list.R;
-import com.example.contact_list.utils.Permission;
+import com.example.contact_list.utils.PermissionHelper;
 
 public class PermissionFragment extends Fragment {
-    private LottieAnimationView mLottiePermission;
     private Button mButton_permission;
 
     public PermissionFragment() {
-        // Required empty public constructor
+
     }
 
     public static PermissionFragment newInstance() {
@@ -44,7 +40,6 @@ public class PermissionFragment extends Fragment {
     }
 
     private void findViews(View view) {
-        mLottiePermission = view.findViewById(R.id.permission_lottie);
         mButton_permission = view.findViewById(R.id.permission_btn);
     }
 
@@ -52,10 +47,8 @@ public class PermissionFragment extends Fragment {
         mButton_permission.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Permission.getContactPermission(getActivity(), Manifest.permission.READ_CONTACTS);
+                PermissionHelper.getContactPermission(getActivity(), Manifest.permission.READ_CONTACTS);
             }
         });
     }
-
-
 }

@@ -5,12 +5,9 @@ import android.content.Context;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.ContactsContract;
-import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -23,25 +20,17 @@ import java.util.concurrent.Executors;
 
 public class ContactContentObserver extends ContentObserver {
     private ContactRepository mContactRepository;
-    private Context mContext;
-
-    public ContactContentObserver(Handler handler) {
-        super(handler);
-
-    }
 
     public ContactContentObserver(Handler handler, Context context) {
         super(handler);
         mContactRepository = ContactRepository.getInstance(context);
-        mContext = context;
     }
 
     @Override
     public void onChange(boolean selfChange, @Nullable Uri uri) {
         super.onChange(selfChange, uri);
         if (!selfChange) {
-            Toast.makeText(mContext, "changed", Toast.LENGTH_SHORT).show();
-            contactGetter(mContext);
+            contactGetter(ApplicationLoader.sContextApplication);
         }
     }
 

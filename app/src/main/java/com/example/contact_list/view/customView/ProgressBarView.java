@@ -1,4 +1,4 @@
-package com.example.contact_list.view;
+package com.example.contact_list.view.customView;
 
 import android.content.Context;
 import android.graphics.Canvas;

@@ -1,4 +1,4 @@
-package com.example.contact_list.controller.list;
+package com.example.contact_list.view.list;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -19,8 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.contact_list.R;
-import com.example.contact_list.controller.detail.DetailFragment;
-import com.example.contact_list.controller.photos.PhotosFragment;
+import com.example.contact_list.view.photos.PhotosFragment;
 import com.example.contact_list.model.Contact;
 import com.example.contact_list.repository.ContactRepository;
 
@@ -28,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ContactListFragment extends Fragment {
-    private static final String TAG_FRAGMENT_DETAIL = "detailContact";
     private static final String TAG_FRAGMENT_PHOTOS = "photosDetail";
     private RecyclerView mRecyclerViewContact;
     private ContactAdapter mContactAdapter;
@@ -38,7 +36,6 @@ public class ContactListFragment extends Fragment {
     private LinearLayout mLayoutEmpty;
 
     public ContactListFragment() {
-
     }
 
     public static ContactListFragment newInstance() {
@@ -59,9 +56,7 @@ public class ContactListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        //View view = inflater.inflate(R.layout.fragment_contact_list, container, false);
         View view = setViewDynamically();
-        //findViews(view);
         initView();
         return view;
     }
@@ -136,13 +131,6 @@ public class ContactListFragment extends Fragment {
         return linearLayout;
     }
 
-    private void findViews(View view) {
-        mRecyclerViewContact = view.findViewById(R.id.contact_list_recycler_view);
-        mLayoutEmpty = view.findViewById(R.id.empty_layout);
-        mFrameLayoutRecycler = view.findViewById(R.id.recyclerLayout);
-
-    }
-
     private void initView() {
         mRecyclerViewContact.setLayoutManager(new LinearLayoutManager(getActivity()));
         updateView();
@@ -160,72 +148,17 @@ public class ContactListFragment extends Fragment {
             mFrameLayoutRecycler.setVisibility(View.VISIBLE);
 
             if (mContactAdapter == null) {
-                mContactAdapter = new ContactAdapter(mContacts);
+                mContactAdapter = new ContactAdapter(mContacts,
+                        getActivity(),getActivity().getSupportFragmentManager());
                 mRecyclerViewContact.setAdapter(mContactAdapter);
             }
             mContactAdapter.setContacts(mContacts);
-            mContactAdapter.notifyDataSetChanged();
-        }
-    }
-
-    private class ContactHolder extends RecyclerView.ViewHolder {
-        private TextView mTextViewDisplayName;
-        private Contact mContact;
-
-        public ContactHolder(View itemView) {
-            super(itemView);
-            mTextViewDisplayName = itemView.findViewById(R.id.display_name);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    DetailFragment detailFragment = DetailFragment.newInstance(mContact);
-                    detailFragment.show(getActivity().getSupportFragmentManager(), TAG_FRAGMENT_DETAIL);
-                }
-            });
-        }
-
-        public void bindContact(Contact contact) {
-            mContact = contact;
-            mTextViewDisplayName.setText(mContact.getNameDisplay());
-        }
-    }
-
-    private class ContactAdapter extends RecyclerView.Adapter<ContactHolder> {
-        private List<Contact> mContacts;
-
-        public ContactAdapter(List<Contact> contacts) {
-            mContacts = contacts;
-        }
-
-        public void setContacts(List<Contact> contacts) {
-            mContacts = contacts;
-        }
-
-        @Override
-        public ContactHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(getActivity()).
-                    inflate(R.layout.contact_item, parent, false);
-            ContactHolder contactHolder = new ContactHolder(view);
-            return contactHolder;
-        }
-
-        @Override
-        public void onBindViewHolder(ContactListFragment.ContactHolder holder, int position) {
-            holder.bindContact(mContacts.get(position));
-        }
-
-        @Override
-        public int getItemCount() {
-            return mContacts.size();
         }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        /*mProgressBar.setVisibility(View.VISIBLE);
-        mFrameLayoutRecycler.setVisibility(View.GONE);
-        mLayoutEmpty.setVisibility(View.GONE);*/
     }
 
     @Override
@@ -233,6 +166,4 @@ public class ContactListFragment extends Fragment {
         super.onResume();
         updateView();
     }
-
-
 }

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".controller.list.ContactListActivity">
+    tools:context=".view.list.ContactListActivity">
 
     <FrameLayout
         android:id="@+id/container_fragment"

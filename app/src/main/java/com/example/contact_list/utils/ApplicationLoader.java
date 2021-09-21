@@ -10,8 +10,5 @@ public class ApplicationLoader extends Application {
     public void onCreate() {
         super.onCreate();
         sContextApplication = getApplicationContext();
-
     }
-
-
 }

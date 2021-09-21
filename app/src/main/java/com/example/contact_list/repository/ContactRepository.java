@@ -1,33 +1,33 @@
 package com.example.contact_list.repository;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.ContactsContract;
 
-import com.example.contact_list.utils.ApplicationLoader;
 import com.example.contact_list.database.ContactDBHelper;
 import com.example.contact_list.database.DataBaseSchema;
 import com.example.contact_list.model.Contact;
+import com.example.contact_list.utils.ApplicationLoader;
+import com.example.contact_list.utils.MyLog;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ContactRepository {
-    private Context mContext;
     private static volatile ContactRepository sInstance;
     private SQLiteDatabase mDatabase;
 
     private ContactRepository(Context context) {
         ContactDBHelper contactDBHelper = new ContactDBHelper(context);
         mDatabase = contactDBHelper.getWritableDatabase();
-        mContext=context;
-
     }
 
     public static ContactRepository getInstance(Context context) {
         if (sInstance == null) {
-            synchronized (ContactRepository .class) {
+            synchronized (ContactRepository.class) {
                 if (sInstance == null) {
                     sInstance = new ContactRepository(context);
                 }
@@ -58,21 +58,6 @@ public class ContactRepository {
         mDatabase.delete(DataBaseSchema.ContactTable.Name, null, null);
     }
 
-    public Contact getContact(String contact_id) {
-        String selection = DataBaseSchema.ContactTable.ContactCols.contactId + " =? ";
-        String[] selectionArgs = new String[]{contact_id};
-        ContactCursorWrapper contactCursorWrapper = getContactCursorWrapper(selection, selectionArgs);
-        if (contactCursorWrapper == null || contactCursorWrapper.getCount() == 0)
-            return null;
-        try {
-            contactCursorWrapper.moveToFirst();
-            return contactCursorWrapper.getContact();
-        } finally {
-            contactCursorWrapper.close();
-            ;
-        }
-    }
-
     public boolean is_exist(String contact_id) {
         String selection = DataBaseSchema.ContactTable.ContactCols.contactId + " =? ";
         String[] selectionArgs = new String[]{contact_id};
@@ -88,21 +73,55 @@ public class ContactRepository {
         }
     }
 
-    public void updateContact(Contact contact) {
-        String whereClause = DataBaseSchema.ContactTable.ContactCols.contactId + " =? ";
-        String[] whereArgs = new String[]{contact.getId()};
-        mDatabase.update(DataBaseSchema.ContactTable.Name, getContentValues(contact), whereClause, whereArgs);
-    }
-
-    public void deleteContact(String id) {
-        String whereClause = DataBaseSchema.ContactTable.ContactCols.contactId + " =? ";
-        String[] whereArgs = new String[]{id};
-        mDatabase.delete(DataBaseSchema.ContactTable.Name, whereClause, whereArgs);
-    }
-
     public void insert(Contact contact) {
         ContentValues values = getContentValues(contact);
         mDatabase.insert(DataBaseSchema.ContactTable.Name, null, values);
+    }
+
+    public static void getAllContacts() {
+
+        ContentResolver contentResolver = ApplicationLoader.sContextApplication.getContentResolver();
+        try {
+            Cursor cursorContact = contentResolver.
+                    query(ContactsContract.Contacts.CONTENT_URI,
+                            null, null, null, null);
+            if (cursorContact != null && cursorContact.getCount() > 0) {
+                cursorContact.moveToFirst();
+                while (cursorContact.moveToNext()) {
+                    String contactNumber = "";
+                    String contactId = cursorContact.getString(cursorContact.getColumnIndex(ContactsContract.Contacts._ID));
+                    String disPlayName = cursorContact.
+                            getString(cursorContact.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                    if (Integer.parseInt(cursorContact.getString
+                            (cursorContact.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
+                        Cursor cursorPhone = contentResolver.
+                                query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                                        null,
+                                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                                        new String[]{contactId},
+                                        null);
+                        if (cursorPhone != null) {
+                            while (cursorPhone.moveToNext()) {
+                                contactNumber = cursorPhone.getString(cursorPhone.
+                                        getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                                if (contactNumber != null && contactNumber.length() > 0) {
+                                    contactNumber = contactNumber.replace(" ", "");
+                                }
+                            }
+                            cursorPhone.close();
+                        }
+                    }
+                    Contact contact = new Contact(contactId, disPlayName, contactNumber);
+                    if (!sInstance.is_exist(contactId)) {
+                        sInstance.insert(contact);
+                    }
+                }
+                cursorContact.close();
+            }
+        } catch (Exception e) {
+            MyLog.e(e);
+        }
+
     }
 
     private ContentValues getContentValues(Contact contact) {

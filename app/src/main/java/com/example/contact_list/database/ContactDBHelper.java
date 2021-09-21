@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.contact_list.utils.ApplicationLoader;
 import com.example.contact_list.database.DataBaseSchema.*;
 
 public class ContactDBHelper extends SQLiteOpenHelper {

@@ -8,7 +8,7 @@ import android.os.Build;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-public class Permission {
+public class PermissionHelper {
     public static final int REQUEST_CODE_CONTACT_PERMISSION = 1;
 
     public static boolean hasContactPermission(Context context, String permission) {

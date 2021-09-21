@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".controller.permission.PermissionFragment"
+    tools:context=".view.permission.PermissionFragment"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <com.airbnb.lottie.LottieAnimationView
         app:lottie_repeatCount="3"

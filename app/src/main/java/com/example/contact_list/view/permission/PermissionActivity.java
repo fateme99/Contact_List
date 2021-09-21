@@ -1,4 +1,4 @@
-package com.example.contact_list.controller.permission;
+package com.example.contact_list.view.permission;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -8,21 +8,19 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import com.example.contact_list.R;
-import com.example.contact_list.controller.SingleFragmentActivity;
-import com.example.contact_list.controller.splash.SplashActivity;
-import com.example.contact_list.utils.Permission;
+import com.example.contact_list.view.splash.SplashActivity;
+import com.example.contact_list.utils.PermissionHelper;
 
-import static com.example.contact_list.utils.Permission.REQUEST_CODE_CONTACT_PERMISSION;
+import static com.example.contact_list.utils.PermissionHelper.REQUEST_CODE_CONTACT_PERMISSION;
 
 public class PermissionActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.single_fragment_activity);
-        if (Permission.hasContactPermission(this, Manifest.permission.READ_CONTACTS)) {
+        if (PermissionHelper.hasContactPermission(this, Manifest.permission.READ_CONTACTS)) {
             startSplashActivity();
         } else {
             FragmentManager fragmentManager = getSupportFragmentManager();

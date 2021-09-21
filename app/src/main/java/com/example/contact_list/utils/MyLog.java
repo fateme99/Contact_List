@@ -1,7 +1,5 @@
 package com.example.contact_list.utils;
 
-import android.util.Log;
-
 import com.example.contact_list.BuildConfig;
 
 public class MyLog {
@@ -10,5 +8,4 @@ public class MyLog {
             e.printStackTrace();
         }
     }
-
 }
