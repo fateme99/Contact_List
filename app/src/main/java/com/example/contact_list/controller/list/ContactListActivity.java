@@ -34,7 +34,7 @@ import java.util.concurrent.Executors;
 import static com.example.contact_list.utils.Permission.REQUEST_CODE_CONTACT_PERMISSION;
 
 public class ContactListActivity extends AppCompatActivity {
-    private ProgressBarView mProgressBar;
+    private ProgressBar mProgressBar;
     private ContactRepository mContactRepository;
     private FrameLayout mFrameLayout;
 
