@@ -10,4 +10,7 @@
     <string name="give_permission_toast">"please give permission to show your contacts..."</string>
     <string name="contact_detail">"Contact Detail"</string>
     <string name="photos_title">"Let's see a little beauty!"</string>
+    <string name="give_permission">Give Permission</string>
+    <string name="contact_permission_desc">This Application needs your permission to read Contacts from your contact list.</string>
+    <string name="please_wait">Please wait...</string>
 </resources>

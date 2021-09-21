@@ -69,16 +69,16 @@ public class ContactListFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu,
                                     @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.photos_fragment_contact_list,menu);
+        inflater.inflate(R.menu.photos_fragment_contact_list, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_photos:
-                PhotosFragment photosFragment=PhotosFragment.newInstance();
-                photosFragment.show(getActivity().getSupportFragmentManager(),TAG_FRAGMENT_PHOTOS);
+                PhotosFragment photosFragment = PhotosFragment.newInstance();
+                photosFragment.show(getActivity().getSupportFragmentManager(), TAG_FRAGMENT_PHOTOS);
 
         }
         return super.onOptionsItemSelected(item);
