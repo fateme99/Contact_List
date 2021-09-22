@@ -19,11 +19,10 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class ContactContentObserver extends ContentObserver {
-    private ContactRepository mContactRepository;
 
-    public ContactContentObserver(Handler handler, Context context) {
+    public ContactContentObserver(Handler handler) {
         super(handler);
-        mContactRepository = ContactRepository.getInstance(context);
+
     }
 
     @Override
@@ -56,7 +55,8 @@ public class ContactContentObserver extends ContentObserver {
 
     private void updateAllContacts(Context context) {
         ContentResolver contentResolver = context.getContentResolver();
-        mContactRepository.deleteAll();
+        ContactRepository contactRepository=ContactRepository.getInstance();
+        contactRepository.deleteAll();
         try {
             Cursor cursor = contentResolver.
                     query(ContactsContract.Contacts.CONTENT_URI,
@@ -65,7 +65,7 @@ public class ContactContentObserver extends ContentObserver {
                 cursor.moveToFirst();
                 while (cursor.moveToNext()) {
                     String contact_NO = "";
-                    String contact_id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                    String contact_id = String.valueOf(cursor.getColumnIndex(ContactsContract.Contacts._ID));
                     String disPlay_name = cursor.
                             getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
                     if (Integer.parseInt(cursor.getString
@@ -74,7 +74,7 @@ public class ContactContentObserver extends ContentObserver {
                                 query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                                         null,
                                         ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                                        new String[]{contact_id},
+                                        new String[]{String.valueOf(contact_id)},
                                         null);
                         if (cursor1 != null) {
                             while (cursor1.moveToNext()) {
@@ -88,8 +88,8 @@ public class ContactContentObserver extends ContentObserver {
                         }
                     }
                     Contact contact = new Contact(contact_id, disPlay_name, contact_NO);
-                    if (!mContactRepository.is_exist(contact_id)) {
-                        mContactRepository.insert(contact);
+                    if (!contactRepository.is_exist(contact_id)) {
+                        contactRepository.insert(contact);
                     }
                 }
                 cursor.close();

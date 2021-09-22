@@ -6,6 +6,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,13 +27,14 @@ import com.example.contact_list.repository.ContactRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class ContactListFragment extends Fragment {
     private static final String TAG_FRAGMENT_PHOTOS = "photosDetail";
     private RecyclerView mRecyclerViewContact;
     private ContactAdapter mContactAdapter;
     private List<Contact> mContacts;
-    private ContactRepository mContactRepository;
     private FrameLayout mFrameLayoutRecycler;
     private LinearLayout mLayoutEmpty;
 
@@ -49,7 +52,6 @@ public class ContactListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContacts = new ArrayList<>();
-        mContactRepository = ContactRepository.getInstance(getActivity());
         setHasOptionsMenu(true);
     }
 
@@ -138,22 +140,36 @@ public class ContactListFragment extends Fragment {
     }
 
     private void updateView() {
-        mContactRepository = ContactRepository.getInstance(getActivity());
-        mContacts = mContactRepository.getContacts();
-        if (mContacts.size() == 0) {
-            mLayoutEmpty.setVisibility(View.VISIBLE);
-            mFrameLayoutRecycler.setVisibility(View.GONE);
-        } else {
-            mLayoutEmpty.setVisibility(View.GONE);
-            mFrameLayoutRecycler.setVisibility(View.VISIBLE);
-
-            if (mContactAdapter == null) {
-                mContactAdapter = new ContactAdapter(mContacts,
-                        getActivity(),getActivity().getSupportFragmentManager());
-                mRecyclerViewContact.setAdapter(mContactAdapter);
+        Executor executor = Executors.newCachedThreadPool();
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                ContactRepository contactRepository = ContactRepository.getInstance();
+                mContacts = contactRepository.getContacts();
+                notifyUI();
             }
-            mContactAdapter.setContacts(mContacts);
-        }
+        };
+        executor.execute(runnable);
+    }
+
+    private void notifyUI() {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(() -> {
+            if (mContacts.size() == 0) {
+                mLayoutEmpty.setVisibility(View.VISIBLE);
+                mFrameLayoutRecycler.setVisibility(View.GONE);
+            } else {
+                mLayoutEmpty.setVisibility(View.GONE);
+                mFrameLayoutRecycler.setVisibility(View.VISIBLE);
+
+                if (mContactAdapter == null) {
+                    mContactAdapter = new ContactAdapter(mContacts,
+                            getActivity(), getActivity().getSupportFragmentManager());
+                    mRecyclerViewContact.setAdapter(mContactAdapter);
+                }
+                mContactAdapter.setContacts(mContacts);
+            }
+        });
     }
 
     @Override

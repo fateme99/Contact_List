@@ -7,8 +7,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.ContactsContract;
 
-import com.example.contact_list.database.ContactDBHelper;
-import com.example.contact_list.database.DataBaseSchema;
+import androidx.room.Room;
+
+import com.example.contact_list.database.ContactDataBase;
+import com.example.contact_list.database.ContactDateBaseDAO;
 import com.example.contact_list.model.Contact;
 import com.example.contact_list.utils.ApplicationLoader;
 import com.example.contact_list.utils.MyLog;
@@ -18,18 +20,21 @@ import java.util.List;
 
 public class ContactRepository {
     private static volatile ContactRepository sInstance;
-    private SQLiteDatabase mDatabase;
+    private ContactDateBaseDAO mContactDAO;
 
-    private ContactRepository(Context context) {
-        ContactDBHelper contactDBHelper = new ContactDBHelper(context);
-        mDatabase = contactDBHelper.getWritableDatabase();
+    private ContactRepository() {
+        ContactDataBase contactDataBase = Room.databaseBuilder(ApplicationLoader.sContextApplication,
+                ContactDataBase.class,
+                "ContactTable.db").
+                build();
+        mContactDAO = contactDataBase.getContactDataBaseDAO();
     }
 
-    public static ContactRepository getInstance(Context context) {
+    public static ContactRepository getInstance() {
         if (sInstance == null) {
             synchronized (ContactRepository.class) {
                 if (sInstance == null) {
-                    sInstance = new ContactRepository(context);
+                    sInstance = new ContactRepository();
                 }
             }
         }
@@ -37,45 +42,21 @@ public class ContactRepository {
     }
 
     public List<Contact> getContacts() {
-        List<Contact> contacts = new ArrayList<>();
-        ContactCursorWrapper contactCursorWrapper = getContactCursorWrapper(null, null);
-        if (contactCursorWrapper == null || contactCursorWrapper.getCount() == 0)
-            return contacts;
-        try {
-            contactCursorWrapper.moveToFirst();
-            while (!contactCursorWrapper.isAfterLast()) {
-                Contact contact = contactCursorWrapper.getContact();
-                contacts.add(contact);
-                contactCursorWrapper.moveToNext();
-            }
-        } finally {
-            contactCursorWrapper.close();
-        }
-        return contacts;
+        return mContactDAO.getContacts();
     }
 
     public void deleteAll() {
-        mDatabase.delete(DataBaseSchema.ContactTable.Name, null, null);
+        mContactDAO.deleteAll();
     }
 
     public boolean is_exist(String contact_id) {
-        String selection = DataBaseSchema.ContactTable.ContactCols.contactId + " =? ";
-        String[] selectionArgs = new String[]{contact_id};
-        ContactCursorWrapper contactCursorWrapper = getContactCursorWrapper(selection, selectionArgs);
-        if (contactCursorWrapper == null || contactCursorWrapper.getCount() == 0)
+        if (mContactDAO.getContact(contact_id) == null)
             return false;
-        try {
-            contactCursorWrapper.moveToFirst();
-            return true;
-        } finally {
-            contactCursorWrapper.close();
-            ;
-        }
+        return true;
     }
 
     public void insert(Contact contact) {
-        ContentValues values = getContentValues(contact);
-        mDatabase.insert(DataBaseSchema.ContactTable.Name, null, values);
+        mContactDAO.insert(contact);
     }
 
     public static void getAllContacts() {
@@ -98,7 +79,7 @@ public class ContactRepository {
                                 query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                                         null,
                                         ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                                        new String[]{contactId},
+                                        new String[]{String.valueOf(contactId)},
                                         null);
                         if (cursorPhone != null) {
                             while (cursorPhone.moveToNext()) {
@@ -122,26 +103,5 @@ public class ContactRepository {
             MyLog.e(e);
         }
 
-    }
-
-    private ContentValues getContentValues(Contact contact) {
-        ContentValues values = new ContentValues();
-        values.put(DataBaseSchema.ContactTable.ContactCols.contactId, contact.getId());
-        values.put(DataBaseSchema.ContactTable.ContactCols.displayName, contact.getNameDisplay());
-        values.put(DataBaseSchema.ContactTable.ContactCols.phoneNO, contact.getPhoneNO());
-        return values;
-    }
-
-    private ContactCursorWrapper getContactCursorWrapper(String selection, String[] selectionArgs) {
-        Cursor cursor = mDatabase.query(
-                DataBaseSchema.ContactTable.Name,
-                null,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                null
-        );
-        return new ContactCursorWrapper(cursor);
     }
 }

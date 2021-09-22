@@ -1,8 +1,6 @@
 package com.example.contact_list.view.splash;
 
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -15,9 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.contact_list.R;
-import com.example.contact_list.view.list.ContactListActivity;
-import com.example.contact_list.model.Contact;
 import com.example.contact_list.repository.ContactRepository;
+import com.example.contact_list.view.list.ContactListActivity;
 import com.example.contact_list.utils.ContactContentObserver;
 import com.example.contact_list.utils.MyLog;
 
@@ -68,7 +65,7 @@ public class SplashFragment extends Fragment {
                     getContentResolver().
                     registerContentObserver(ContactsContract.Contacts.CONTENT_URI,
                             true,
-                            new ContactContentObserver(new Handler(), getActivity()));
+                            new ContactContentObserver(new Handler()));
         } catch (Exception e) {
             MyLog.e(e);
         }
