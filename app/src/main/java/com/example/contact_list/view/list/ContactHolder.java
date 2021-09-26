@@ -14,22 +14,21 @@ import com.example.contact_list.model.Contact;
 public class ContactHolder extends RecyclerView.ViewHolder {
     private ContactItemBinding mBinding;
     private static final String TAG_FRAGMENT_DETAIL = "detailContact";
-    private Contact mContact;
+    FragmentManager mFragmentManager;
 
     public ContactHolder(ContactItemBinding contactItemBinding, FragmentManager fragmentManager) {
         super(contactItemBinding.getRoot());
-        mBinding=contactItemBinding;
-        mBinding.displayName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DetailFragment detailFragment = DetailFragment.newInstance(mContact);
-                detailFragment.show(fragmentManager,TAG_FRAGMENT_DETAIL);
-            }
-        });
+        mBinding = contactItemBinding;
+        mBinding.setContactHolder(this);
+        mFragmentManager = fragmentManager;
+    }
+
+    public void startDetailFragment() {
+        DetailFragment detailFragment = DetailFragment.newInstance(mBinding.getContact());
+        detailFragment.show(mFragmentManager, TAG_FRAGMENT_DETAIL);
     }
 
     public void bindContact(Contact contact) {
-        mContact = contact;
-        mBinding.displayName.setText(mContact.getNameDisplay());
+        mBinding.setContact(contact);
     }
 }

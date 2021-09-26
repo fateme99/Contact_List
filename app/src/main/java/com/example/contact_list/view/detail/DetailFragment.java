@@ -19,7 +19,7 @@ import com.example.contact_list.model.Contact;
 public class DetailFragment extends DialogFragment {
     private FragmentDetailBinding mBinding;
     private static final String ARGS_CONTACT = "contact";
-    private Contact mContact;
+    Contact mContact;
 
     public DetailFragment() {
 
@@ -45,8 +45,8 @@ public class DetailFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_detail, null, false);
-        setValues();
-        setListeners();
+        mBinding.setContact(mContact);
+        mBinding.setContactDetail(this);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.contact_detail)
                 .setView(mBinding.getRoot());
@@ -54,13 +54,4 @@ public class DetailFragment extends DialogFragment {
         return dialog;
     }
 
-    private void setValues() {
-        mBinding.contactIdTxt.setText(mContact.getId());
-        mBinding.contactDisplayNameTxt.setText(mContact.getNameDisplay());
-        mBinding.contactPhoneNumber.setText(mContact.getPhoneNO());
-    }
-
-    private void setListeners() {
-        mBinding.okBtn.setOnClickListener(view -> getDialog().dismiss());
-    }
 }
