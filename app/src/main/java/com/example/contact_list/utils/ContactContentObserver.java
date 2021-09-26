@@ -22,7 +22,6 @@ public class ContactContentObserver extends ContentObserver {
 
     public ContactContentObserver(Handler handler) {
         super(handler);
-
     }
 
     @Override
@@ -34,23 +33,17 @@ public class ContactContentObserver extends ContentObserver {
     }
 
     private void contactGetter(Context context) {
-        Executor executor = Executors.newCachedThreadPool();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                updateAllContacts(context);
-                notifyToUI();
-            }
+        Runnable runnable = () -> {
+            updateAllContacts(context);
+            notifyToUI();
         };
-        executor.execute(runnable);
+        ExecutorHelper.doInOtherThread(runnable);
     }
 
     private void notifyToUI() {
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(() -> {
+        ExecutorHelper.getMainHandler().post(() -> {
             // TODO: 9/19/2021 send main thread to show the list
         });
-
     }
 
     private void updateAllContacts(Context context) {

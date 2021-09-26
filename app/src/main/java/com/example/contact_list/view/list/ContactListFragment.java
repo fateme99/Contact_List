@@ -21,9 +21,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.contact_list.R;
-import com.example.contact_list.view.photos.PhotosFragment;
+import com.example.contact_list.databinding.FragmentContactListBinding;
 import com.example.contact_list.model.Contact;
 import com.example.contact_list.repository.ContactRepository;
+import com.example.contact_list.utils.ExecutorHelper;
+import com.example.contact_list.view.photos.PhotosFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +45,6 @@ public class ContactListFragment extends Fragment {
 
     public static ContactListFragment newInstance() {
         ContactListFragment fragment = new ContactListFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
         return fragment;
     }
 
@@ -82,10 +82,10 @@ public class ContactListFragment extends Fragment {
     }
 
     private View setViewDynamically() {
-        LinearLayout linearLayout = new LinearLayout(getActivity());
+        LinearLayout linearLayoutRoot = new LinearLayout(getActivity());
 
-        linearLayout.setOrientation(LinearLayout.VERTICAL);
-        linearLayout.setGravity(Gravity.CENTER);
+        linearLayoutRoot.setOrientation(LinearLayout.VERTICAL);
+        linearLayoutRoot.setGravity(Gravity.CENTER);
 
         mFrameLayoutRecycler = new FrameLayout(getActivity());
         mFrameLayoutRecycler.setLayoutParams(new FrameLayout.LayoutParams(
@@ -100,7 +100,7 @@ public class ContactListFragment extends Fragment {
                 ViewGroup.LayoutParams.MATCH_PARENT
         ));
         mFrameLayoutRecycler.addView(mRecyclerViewContact);
-        linearLayout.addView(mFrameLayoutRecycler);
+        linearLayoutRoot.addView(mFrameLayoutRecycler);
 
         mLayoutEmpty = new LinearLayout(getActivity());
         mLayoutEmpty.setLayoutParams(new LinearLayout.LayoutParams(
@@ -110,27 +110,27 @@ public class ContactListFragment extends Fragment {
         mLayoutEmpty.setOrientation(LinearLayout.VERTICAL);
         mLayoutEmpty.setGravity(Gravity.CENTER);
         mLayoutEmpty.setVisibility(View.GONE);
-        ImageView imageView = new ImageView(getActivity());
-        imageView.setLayoutParams(new ViewGroup.LayoutParams(
+        ImageView imageViewEmptyBox = new ImageView(getActivity());
+        imageViewEmptyBox.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         ));
 
-        imageView.setImageResource(R.drawable.ic_empty_icon);
-        mLayoutEmpty.addView(imageView);
+        imageViewEmptyBox.setImageResource(R.drawable.ic_empty_icon);
+        mLayoutEmpty.addView(imageViewEmptyBox);
 
-        TextView textView = new TextView(getActivity());
+        TextView textViewEmptyBox = new TextView(getActivity());
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
         params.setMargins(0, 20, 0, 0);
-        textView.setText(R.string.empty_box);
-        textView.setTextSize(24);
-        textView.setLayoutParams(params);
-        mLayoutEmpty.addView(textView);
-        linearLayout.addView(mLayoutEmpty);
-        return linearLayout;
+        textViewEmptyBox.setText(R.string.empty_box);
+        textViewEmptyBox.setTextSize(24);
+        textViewEmptyBox.setLayoutParams(params);
+        mLayoutEmpty.addView(textViewEmptyBox);
+        linearLayoutRoot.addView(mLayoutEmpty);
+        return linearLayoutRoot;
     }
 
     private void initView() {
@@ -140,21 +140,17 @@ public class ContactListFragment extends Fragment {
     }
 
     private void updateView() {
-        Executor executor = Executors.newCachedThreadPool();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                ContactRepository contactRepository = ContactRepository.getInstance();
-                mContacts = contactRepository.getContacts();
-                notifyUI();
-            }
+        Runnable runnable = () -> {
+            ContactRepository contactRepository = ContactRepository.getInstance();
+            mContacts = contactRepository.getContacts();
+            notifyUI();
         };
-        executor.execute(runnable);
+        ExecutorHelper.doInOtherThread(runnable);
+
     }
 
     private void notifyUI() {
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(() -> {
+        ExecutorHelper.getMainHandler().postAtFrontOfQueue(() -> {
             if (mContacts.size() == 0) {
                 mLayoutEmpty.setVisibility(View.VISIBLE);
                 mFrameLayoutRecycler.setVisibility(View.GONE);
@@ -164,22 +160,11 @@ public class ContactListFragment extends Fragment {
 
                 if (mContactAdapter == null) {
                     mContactAdapter = new ContactAdapter(mContacts,
-                            getActivity(), getActivity().getSupportFragmentManager());
+                             getActivity().getSupportFragmentManager());
                     mRecyclerViewContact.setAdapter(mContactAdapter);
                 }
                 mContactAdapter.setContacts(mContacts);
             }
         });
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        updateView();
     }
 }

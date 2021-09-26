@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 import androidx.room.Room;
 
@@ -93,8 +94,8 @@ public class ContactRepository {
                         }
                     }
                     Contact contact = new Contact(contactId, disPlayName, contactNumber);
-                    if (!sInstance.is_exist(contactId)) {
-                        sInstance.insert(contact);
+                    if (!getInstance().is_exist(contactId)) {
+                        getInstance().insert(contact);
                     }
                 }
                 cursorContact.close();
@@ -102,6 +103,5 @@ public class ContactRepository {
         } catch (Exception e) {
             MyLog.e(e);
         }
-
     }
 }

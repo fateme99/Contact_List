@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.DialogFragment;
 
 import android.view.LayoutInflater;
@@ -12,9 +13,11 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.example.contact_list.R;
+import com.example.contact_list.databinding.FragmentPermissionBinding;
+import com.example.contact_list.databinding.FragmentPhotosBinding;
 
 public class PhotosFragment extends DialogFragment {
-    private ImageView mImageView_first, mImageView_second, mImageView_third;
+    private FragmentPhotosBinding mBinding;
 
     public PhotosFragment() {
 
@@ -33,19 +36,15 @@ public class PhotosFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        LayoutInflater inflater = LayoutInflater.from(getActivity());
-        View view = inflater.inflate(R.layout.fragment_photos, null);
-        findViews(view);
+        mBinding= DataBindingUtil.
+                inflate(LayoutInflater.from(getContext()),
+                        R.layout.fragment_photos,
+                        null,
+                        false);
         setValues();
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity()).
-                setTitle(R.string.photos_title).setView(view);
+                setTitle(R.string.photos_title).setView(mBinding.getRoot());
         return builder.create();
-    }
-
-    private void findViews(View view) {
-        mImageView_first = view.findViewById(R.id.image1);
-        mImageView_second = view.findViewById(R.id.image2);
-        mImageView_third = view.findViewById(R.id.image3);
     }
 
     private void setValues() {
@@ -56,7 +55,7 @@ public class PhotosFragment extends DialogFragment {
                 .circleCrop()
                 .placeholder(R.drawable.ic_internet)
                 .error(R.drawable.ic_internet_error)
-                .into(mImageView_first);
+                .into(mBinding.image1);
         String image2Url = getString(R.string.image2_url);
         Glide.with(getActivity())
                 .load(image2Url)
@@ -64,7 +63,7 @@ public class PhotosFragment extends DialogFragment {
                 .circleCrop()
                 .placeholder(R.drawable.ic_internet)
                 .error(R.drawable.ic_internet_error)
-                .into(mImageView_second);
+                .into(mBinding.image2);
         String image3Url = getString(R.string.image3_url);
         Glide.with(getActivity())
                 .load(image3Url)
@@ -72,7 +71,7 @@ public class PhotosFragment extends DialogFragment {
                 .circleCrop()
                 .placeholder(R.drawable.ic_internet)
                 .error(R.drawable.ic_internet_error)
-                .into(mImageView_third);
+                .into(mBinding.image3);
 
 
     }

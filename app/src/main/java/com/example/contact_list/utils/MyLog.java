@@ -8,4 +8,10 @@ public class MyLog {
             e.printStackTrace();
         }
     }
+    public static void d(Exception e){
+        if (BuildConfig.DEBUG){
+            e.printStackTrace();
+        }
+    }
+
 }

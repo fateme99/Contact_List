@@ -3,25 +3,32 @@ package com.example.contact_list.view.splash;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.contact_list.databinding.FragmentSplashBinding;
+import com.example.contact_list.model.Contact;
+import com.example.contact_list.view.list.ContactListActivity;
 import com.example.contact_list.R;
 import com.example.contact_list.repository.ContactRepository;
-import com.example.contact_list.view.list.ContactListActivity;
 import com.example.contact_list.utils.ContactContentObserver;
 import com.example.contact_list.utils.MyLog;
 
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class SplashFragment extends Fragment {
+    private FragmentSplashBinding mBinding;
+
     public SplashFragment() {
     }
 
@@ -40,20 +47,20 @@ public class SplashFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_splash, container, false);
+        mBinding = DataBindingUtil.
+                inflate(inflater, R.layout.fragment_splash, container, false);
         contactGetter();
         setContactObserver();
-        return view;
+        return mBinding.getRoot();
     }
 
     private void contactGetter() {
+
+
         Executor executor = Executors.newCachedThreadPool();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                ContactRepository.getAllContacts();
-                notifyToUI();
-            }
+        Runnable runnable = () -> {
+            ContactRepository.getAllContacts();
+            notifyToUI();
         };
         executor.execute(runnable);
     }

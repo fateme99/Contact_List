@@ -3,6 +3,7 @@ package com.example.contact_list.view.permission;
 import android.Manifest;
 import android.os.Bundle;
 
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -11,10 +12,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.contact_list.R;
+import com.example.contact_list.databinding.FragmentPermissionBinding;
 import com.example.contact_list.utils.PermissionHelper;
 
 public class PermissionFragment extends Fragment {
-    private Button mButton_permission;
+    private FragmentPermissionBinding mBinding;
 
     public PermissionFragment() {
 
@@ -33,22 +35,13 @@ public class PermissionFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_permission, container, false);
-        findViews(view);
+        mBinding = DataBindingUtil.
+                inflate(inflater, R.layout.fragment_permission, container, false);
         setListeners();
-        return view;
-    }
-
-    private void findViews(View view) {
-        mButton_permission = view.findViewById(R.id.permission_btn);
+        return mBinding.getRoot();
     }
 
     private void setListeners() {
-        mButton_permission.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                PermissionHelper.getContactPermission(getActivity(), Manifest.permission.READ_CONTACTS);
-            }
-        });
+        mBinding.permissionBtn.setOnClickListener(view -> PermissionHelper.getContactPermission(getActivity(), Manifest.permission.READ_CONTACTS));
     }
 }

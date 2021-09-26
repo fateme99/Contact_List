@@ -1,36 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:padding="16dp"
-    android:orientation="vertical"
-    android:gravity="center"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".view.permission.PermissionFragment"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <com.airbnb.lottie.LottieAnimationView
-        app:lottie_repeatCount="3"
-        android:layout_centerInParent="true"
-        android:elevation="5dp"
-        app:lottie_autoPlay="true"
-        app:lottie_rawRes="@raw/permission"
-        android:id="@+id/permission_lottie"
-        android:layout_width="300dp"
-        android:layout_height="300dp"/>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <TextView
-        android:layout_margin="16dp"
-        android:textColor="@color/black"
-        android:textSize="24sp"
-        android:text="@string/contact_permission_desc"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <Button
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:text="@string/give_permission"
-        android:id="@+id/permission_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp"
+        tools:context=".view.permission.PermissionFragment">
 
-</LinearLayout>
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/permission_lottie"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_centerInParent="true"
+            android:elevation="5dp"
+            app:lottie_autoPlay="true"
+            app:lottie_rawRes="@raw/permission"
+            app:lottie_repeatCount="3" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="@string/contact_permission_desc"
+            android:textColor="@color/black"
+            android:textSize="24sp" />
+
+        <Button
+            android:id="@+id/permission_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/give_permission"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+</layout>

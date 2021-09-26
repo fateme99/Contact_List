@@ -8,7 +8,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.example.contact_list.R;
 import com.example.contact_list.view.splash.SplashActivity;
@@ -17,13 +16,10 @@ import com.example.contact_list.utils.PermissionHelper;
 import static com.example.contact_list.utils.PermissionHelper.REQUEST_CODE_CONTACT_PERMISSION;
 
 public class PermissionActivity extends AppCompatActivity {
-    private static final String TAG = "live db : ";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.single_fragment_activity);
-        //Log.d(TAG, DebugDB.get);
         if (PermissionHelper.hasContactPermission(this, Manifest.permission.READ_CONTACTS)) {
             startSplashActivity();
         } else {
