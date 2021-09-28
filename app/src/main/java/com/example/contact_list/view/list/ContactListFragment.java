@@ -6,8 +6,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,16 +19,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.contact_list.R;
-import com.example.contact_list.databinding.FragmentContactListBinding;
 import com.example.contact_list.model.Contact;
 import com.example.contact_list.repository.ContactRepository;
+import com.example.contact_list.utils.ContactAdapter;
 import com.example.contact_list.utils.ExecutorHelper;
 import com.example.contact_list.view.photos.PhotosFragment;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 public class ContactListFragment extends Fragment {
     private static final String TAG_FRAGMENT_PHOTOS = "photosDetail";

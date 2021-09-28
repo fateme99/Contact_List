@@ -1,4 +1,4 @@
-package com.example.contact_list.view.list;
+package com.example.contact_list.utils;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;

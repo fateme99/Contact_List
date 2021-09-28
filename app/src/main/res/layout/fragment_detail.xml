@@ -5,12 +5,8 @@
     <data>
 
         <variable
-            name="contact"
-            type="com.example.contact_list.model.Contact" />
-
-        <variable
-            name="contactDetail"
-            type="com.example.contact_list.view.detail.DetailFragment" />
+            name="detailViewModel"
+            type="com.example.contact_list.viewModel.DetailViewModel" />
     </data>
 
     <LinearLayout
@@ -35,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:padding="8dp"
-            android:text="@{contact.id}"
+            android:text="@{detailViewModel.contact.id}"
             android:textColor="@color/black"
             android:textSize="18sp" />
 
@@ -53,7 +49,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:padding="8dp"
-            android:text="@{contact.nameDisplay}"
+            android:text="@{detailViewModel.contact.nameDisplay}"
             android:textColor="@color/black"
             android:textSize="18sp" />
 
@@ -71,7 +67,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:padding="8dp"
-            android:text="@{contact.phoneNO}"
+            android:text="@{detailViewModel.contact.phoneNO}"
             android:textColor="@color/black"
             android:textSize="18sp" />
 
@@ -80,7 +76,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/light_green"
-            android:onClick="@{ ()-> contactDetail.dismiss()}"
+            android:onClick="@{ ()-> detailViewModel.disMissDialog()}"
             android:text="@string/ok"
             android:textColor="@color/black" />
 

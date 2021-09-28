@@ -34,8 +34,6 @@ public class SplashFragment extends Fragment {
 
     public static SplashFragment newInstance() {
         SplashFragment fragment = new SplashFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
         return fragment;
     }
 

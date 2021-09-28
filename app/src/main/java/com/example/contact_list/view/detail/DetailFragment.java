@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.example.contact_list.R;
 import com.example.contact_list.databinding.FragmentDetailBinding;
 import com.example.contact_list.model.Contact;
+import com.example.contact_list.viewModel.DetailViewModel;
 
 public class DetailFragment extends DialogFragment {
     private FragmentDetailBinding mBinding;
@@ -45,8 +46,7 @@ public class DetailFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_detail, null, false);
-        mBinding.setContact(mContact);
-        mBinding.setContactDetail(this);
+        mBinding.setDetailViewModel(new DetailViewModel(mContact, this));
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.contact_detail)
                 .setView(mBinding.getRoot());
